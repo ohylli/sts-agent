@@ -57,9 +57,9 @@ Currently in **Phase 1**: Feasibility Testing
 
 ## Key Files
 
-- `plan.md`: Complete technical design and implementation plan
-- `tasks.md`: Phase 1 task list with specific testing objectives
-- `textthespire.md`: Documentation about the Text the Spire mod
+- `docs/plan.md`: Complete technical design and implementation plan
+- `docs/tasks.md`: Phase 1 task list with specific testing objectives
+- `docs/textthespire.md`: Documentation about the Text the Spire mod
 
 ## Testing Approach
 
