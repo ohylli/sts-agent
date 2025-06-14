@@ -1,0 +1,107 @@
+{
+  "timestamp": "20250614_180506",
+  "session_name": "before_restart",
+  "handles": {
+    "game_state_windows": [
+      {
+        "title": "Output",
+        "handle": 12914012,
+        "class_name": "SWT_Window0",
+        "size": "450x525",
+        "process_id": 0
+      },
+      {
+        "title": "Log",
+        "handle": 1772646,
+        "class_name": "SWT_Window0",
+        "size": "450x525",
+        "process_id": 0
+      },
+      {
+        "title": "Orbs",
+        "handle": 17630916,
+        "class_name": "SWT_Window0",
+        "size": "300x300",
+        "process_id": 0
+      },
+      {
+        "title": "Player",
+        "handle": 74121302,
+        "class_name": "SWT_Window0",
+        "size": "300x300",
+        "process_id": 0
+      },
+      {
+        "title": "Relic",
+        "handle": 1247960,
+        "class_name": "SWT_Window0",
+        "size": "300x300",
+        "process_id": 0
+      },
+      {
+        "title": "Discard",
+        "handle": 8522778,
+        "class_name": "SWT_Window0",
+        "size": "300x300",
+        "process_id": 0
+      },
+      {
+        "title": "Deck",
+        "handle": 26806918,
+        "class_name": "SWT_Window0",
+        "size": "300x300",
+        "process_id": 0
+      },
+      {
+        "title": "Monster",
+        "handle": 67635322,
+        "class_name": "SWT_Window0",
+        "size": "400x600",
+        "process_id": 0
+      },
+      {
+        "title": "Hand",
+        "handle": 2493434,
+        "class_name": "SWT_Window0",
+        "size": "300x300",
+        "process_id": 0
+      }
+    ],
+    "prompt_window": [
+      {
+        "title": "Prompt",
+        "handle": 1510108,
+        "class_name": "SunAwtFrame",
+        "size": "300x100",
+        "process_id": 0
+      }
+    ],
+    "main_game_window": [
+      {
+        "title": "Modded Slay the Spire",
+        "handle": 82576968,
+        "class_name": "LWJGL",
+        "size": "1920x1080",
+        "process_id": 0
+      }
+    ],
+    "mod_launcher": [
+      {
+        "title": "ModTheSpire 3.30.3",
+        "handle": 13699732,
+        "class_name": "SunAwtFrame",
+        "size": "160x28",
+        "process_id": 0
+      }
+    ],
+    "other_spire_windows": [
+      {
+        "title": "Microsoft Text Input Application",
+        "handle": 66408,
+        "class_name": "Windows.UI.Core.CoreWindow",
+        "size": "1920x1080",
+        "process_id": 0
+      }
+    ]
+  }
+}
