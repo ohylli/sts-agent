@@ -14,7 +14,7 @@ Phase 1 focuses on proving the basic technical feasibility of interacting with S
 
 ### 1. Environment Setup
 **Priority: High**
-**Status: in progress**
+**Status: done**
 
 #### 1.1 Install Required Tools
 - [X] Install Python 3.8+ with virtual environment
@@ -26,7 +26,7 @@ Phase 1 focuses on proving the basic technical feasibility of interacting with S
 #### 1.2 Install Testing Libraries
 - [X] Install pywinauto for text window reading
 - [X] Install win32api/pywin32 for Windows API text reading
-- [ ] Create requirements.txt with all dependencies
+- [X] Create requirements.txt with all dependencies
 
 
 ### 2. Window Detection and Enumeration
