@@ -1,711 +1,767 @@
-# Slay the Spire Text-Based Agent Development Plan
+# Slay the Spire Tool Suite Development Plan
 
 ## Executive Summary
 
-This document outlines approaches for creating a Python program that can programmatically interact with Slay the Spire through the Text the Spire mod. The goal is to create an agent that can read game state from text windows, make intelligent decisions, and send commands to control gameplay.
+This document outlines the development of a Python tool suite that enables Claude Code to play Slay the Spire through the Text the Spire mod. The focus is on creating clean, reliable tools that Claude can invoke to read game state from text windows and send commands to the game. Claude Code will handle all strategic decision-making using its reasoning capabilities.
 
-## 1. Window Detection and Text Extraction Methods
+## 1. Overview and Key Concepts
 
-### 1.1 Windows API Approach (Windows-specific)
-**Description**: Use Windows API through Python libraries like `pywin32` or `ctypes` to find windows and extract text.
+### 1.1 What This Project Provides
+This project creates a Python toolkit that acts as Claude Code's "hands and eyes" for playing Slay the Spire. Instead of building an autonomous agent, we're building tools that Claude can call to:
+- See what's happening in the game (read windows)
+- Take actions (send commands)
+- Understand game mechanics (analyze cards, simulate plays)
 
-**Implementation**:
+### 1.2 How Claude Will Use These Tools
+
+**Example: Claude Playing a Combat Turn**
 ```python
-# Using pywin32
-import win32gui
-import win32api
-import win32con
+# Claude calls tool to see the game state
+state = read_game_state()
+# Returns: {'mode': 'combat', 'player': {'hp': 45, 'energy': 3}, ...}
 
-# Find windows by title
-def find_sts_windows():
-    windows = []
-    def callback(hwnd, windows):
-        if win32gui.IsWindowVisible(hwnd):
-            window_text = win32gui.GetWindowText(hwnd)
-            if "Text the Spire" in window_text or "Slay the Spire" in window_text:
-                windows.append((hwnd, window_text))
-    win32gui.EnumWindows(callback, windows)
-    return windows
+# Claude calls tool to understand the combat situation
+combat = parse_combat_state(state['raw_windows']['combat'])
+# Returns: {'enemies': [{'name': 'Cultist', 'hp': 48, 'intent': 'attack'}], ...}
 
-# Get window text content
-def get_window_text(hwnd):
-    # For standard windows with text controls
-    text = win32gui.GetWindowText(hwnd)
-    # May need to enumerate child controls
-    return text
+# Claude decides to play a Strike card at enemy 0
+result = play_card(card_index=0, target_index=0)
+# Returns: {'success': True, 'damage_dealt': 6, ...}
 ```
 
-**Pros**:
-- Direct access to window handles
-- Fast and efficient
-- Can send messages directly to windows
-- No need for OCR
+Claude handles all the strategy and decision-making. The tools just provide the interface.
 
-**Cons**:
-- Windows-only solution
-- May not work if text is rendered as graphics
-- Requires understanding of Windows API
+## 2. Core Principles and Architecture
 
-### 1.2 UI Automation API Approach
-**Description**: Use UI Automation libraries that work across platforms to interact with application windows.
+### 2.1 Tool-Based Design Philosophy
+- Each tool should have a single, clear purpose
+- Tools return structured data that Claude can easily interpret
+- Error handling should be robust but transparent to Claude
+- Tools should be stateless where possible (Claude maintains context)
+- Focus on reliability over optimization
 
-**Implementation Options**:
-- **pywinauto** (Windows): Robust UI automation
-- **pyautogui** (Cross-platform): Screen automation with OCR
-- **uiautomation** (Windows): Python wrapper for Windows UI Automation
+### 2.2 Tool Categories
+1. **Game State Reading Tools**: Extract information from Text the Spire windows
+2. **Command Tools**: Send actions to the game
+3. **Helper Tools**: Parse complex game elements and provide analysis
+4. **State Management Tools**: Track game progression and history
 
+## 3. Window Detection and Text Extraction Tools
+
+### 3.1 Window Discovery Tool
+**Purpose**: Find all Text the Spire windows currently open
+
+**Tool Interface**:
 ```python
-from pywinauto import Desktop
-
-# Find and connect to application
-app = Desktop(backend="uia").window(title_re=".*Slay the Spire.*")
+def find_game_windows() -> List[Dict[str, Any]]:
+    """
+    Discovers all Text the Spire related windows.
     
-# Find text windows
-text_windows = app.children(control_type="Window")
-for window in text_windows:
-    if "Text the Spire" in window.window_text():
-        content = window.get_value() or window.window_text()
+    Returns:
+        List of window info dictionaries containing:
+        - 'handle': Window handle for future operations
+        - 'title': Full window title
+        - 'type': Window type (e.g., 'player_info', 'combat', 'map', 'prompt')
+        - 'visible': Whether window is currently visible
+    """
 ```
 
-**Pros**:
-- Higher-level API than raw Windows API
-- Better support for complex UI elements
-- Can handle various control types
+**Implementation Considerations**:
+- Use pywinauto or win32gui for Windows
+- Cache window handles for performance
+- Auto-detect window types based on title patterns
+- Handle cases where windows are minimized or hidden
 
-**Cons**:
-- Still mostly Windows-specific
-- May have performance overhead
-- Requires the application to expose UI elements properly
+### 3.2 Window Text Reading Tool
+**Purpose**: Extract text content from a specific game window
 
-### 1.3 OCR-Based Approach
-**Description**: Capture screenshots and use OCR to extract text from specific window regions.
-
-**Implementation**:
+**Tool Interface**:
 ```python
-import pyautogui
-import pytesseract
-from PIL import Image
-import cv2
-import numpy as np
-
-def capture_window_region(x, y, width, height):
-    screenshot = pyautogui.screenshot(region=(x, y, width, height))
-    return screenshot
-
-def extract_text_ocr(image):
-    # Preprocess for better OCR
-    gray = cv2.cvtColor(np.array(image), cv2.COLOR_RGB2GRAY)
-    # Apply threshold or other preprocessing
-    text = pytesseract.image_to_string(gray)
-    return text
-
-def find_window_coordinates():
-    # Use template matching or manual configuration
-    # to find window positions
-    pass
-```
-
-**Pros**:
-- Works regardless of how text is rendered
-- Cross-platform solution
-- Can handle any visual text
-
-**Cons**:
-- Slower than direct text extraction
-- OCR accuracy issues possible
-- Requires window positioning/detection
-- CPU intensive
-
-### 1.4 Memory Reading Approach
-**Description**: Read game memory directly to extract game state (advanced approach).
-
-**Pros**:
-- Most reliable game state information
-- Very fast
-- Complete game state access
-
-**Cons**:
-- Complex implementation
-- Game updates can break it
-- May be detected as cheating
-- Requires reverse engineering
-
-### Recommended Approach: Hybrid Solution
-Start with UI Automation (pywinauto) for Windows, with OCR as a fallback for text that can't be extracted directly.
-
-## 2. Command Input Methods
-
-### 2.1 Direct Window Messaging
-**Description**: Send keyboard input directly to the prompt window.
-
-```python
-import win32gui
-import win32con
-import win32api
-
-def send_command_to_window(hwnd, command):
-    # Set focus to window
-    win32gui.SetForegroundWindow(hwnd)
+def read_window_text(window_handle: int) -> Dict[str, Any]:
+    """
+    Reads the current text content from a game window.
     
-    # Send each character
-    for char in command:
-        win32api.SendMessage(hwnd, win32con.WM_CHAR, ord(char), 0)
-    
-    # Send Enter key
-    win32api.SendMessage(hwnd, win32con.WM_KEYDOWN, win32con.VK_RETURN, 0)
-```
-
-### 2.2 Keyboard Automation
-**Description**: Simulate keyboard input using automation libraries.
-
-```python
-import pyautogui
-import time
-
-def send_command_pyautogui(command):
-    # Click on prompt window first
-    pyautogui.click(prompt_x, prompt_y)
-    time.sleep(0.1)
-    
-    # Type command
-    pyautogui.typewrite(command)
-    pyautogui.press('enter')
-```
-
-### 2.3 Clipboard-Based Input
-**Description**: Copy command to clipboard and paste into prompt.
-
-```python
-import pyperclip
-import pyautogui
-
-def send_command_clipboard(command):
-    pyperclip.copy(command)
-    pyautogui.hotkey('ctrl', 'v')
-    pyautogui.press('enter')
-```
-
-**Recommended**: Direct window messaging for reliability, with keyboard automation as fallback.
-
-## 3. Game State Parsing and Representation
-
-### 3.1 Text Parser Architecture
-
-```python
-class GameStateParser:
-    def __init__(self):
-        self.parsers = {
-            'player': self.parse_player_info,
-            'map': self.parse_map,
-            'combat': self.parse_combat,
-            'cards': self.parse_cards,
-            'relics': self.parse_relics,
-            'potions': self.parse_potions,
-            'shop': self.parse_shop,
-            'event': self.parse_event
-        }
-    
-    def parse_window_text(self, window_name, text):
-        parser = self.parsers.get(window_name)
-        if parser:
-            return parser(text)
-        return None
-    
-    def parse_player_info(self, text):
-        # Extract HP, energy, gold, etc.
-        player_state = {}
-        lines = text.split('\n')
-        for line in lines:
-            if 'HP:' in line:
-                player_state['hp'] = self.extract_numbers(line)
-            elif 'Energy:' in line:
-                player_state['energy'] = self.extract_numbers(line)
-            # ... more parsing
-        return player_state
-```
-
-### 3.2 Game State Representation
-
-```python
-from dataclasses import dataclass
-from typing import List, Dict, Optional
-from enum import Enum
-
-class CardType(Enum):
-    ATTACK = "Attack"
-    SKILL = "Skill"
-    POWER = "Power"
-    STATUS = "Status"
-    CURSE = "Curse"
-
-@dataclass
-class Card:
-    name: str
-    cost: int
-    card_type: CardType
-    description: str
-    upgraded: bool = False
-    
-@dataclass
-class Enemy:
-    name: str
-    hp: int
-    max_hp: int
-    intent: str
-    buffs: List[str]
-    debuffs: List[str]
-
-@dataclass
-class Player:
-    hp: int
-    max_hp: int
-    energy: int
-    max_energy: int
-    block: int
-    gold: int
-    buffs: List[str]
-    debuffs: List[str]
-
-@dataclass
-class GameState:
-    player: Player
-    enemies: List[Enemy]
-    hand: List[Card]
-    draw_pile: List[Card]
-    discard_pile: List[Card]
-    exhaust_pile: List[Card]
-    relics: List[str]
-    potions: List[str]
-    current_floor: int
-    current_act: int
-    game_mode: str  # "combat", "map", "shop", "event", etc.
-```
-
-### 3.3 State Update System
-
-```python
-class GameStateManager:
-    def __init__(self):
-        self.current_state = GameState()
-        self.previous_states = []
-        self.state_parser = GameStateParser()
-    
-    def update_from_windows(self, window_texts: Dict[str, str]):
-        new_state = self.build_state(window_texts)
-        self.previous_states.append(self.current_state)
-        self.current_state = new_state
-        return new_state
-    
-    def build_state(self, window_texts):
-        # Parse each window and construct complete game state
-        state = GameState()
-        for window_name, text in window_texts.items():
-            parsed = self.state_parser.parse_window_text(window_name, text)
-            self.update_state_component(state, window_name, parsed)
-        return state
-```
-
-## 4. Decision-Making Architecture
-
-### 4.1 Rule-Based System
-Simple but effective for basic gameplay:
-
-```python
-class RuleBasedAgent:
-    def __init__(self):
-        self.rules = [
-            self.check_lethal,
-            self.check_block_needed,
-            self.check_power_cards,
-            self.check_card_draw,
-            self.check_energy_efficiency
-        ]
-    
-    def decide_action(self, game_state: GameState):
-        for rule in self.rules:
-            action = rule(game_state)
-            if action:
-                return action
-        return "end"  # End turn if no actions
-    
-    def check_lethal(self, game_state):
-        # Check if we can kill all enemies
-        total_damage = self.calculate_potential_damage(game_state)
-        total_enemy_hp = sum(e.hp for e in game_state.enemies)
-        if total_damage >= total_enemy_hp:
-            return self.get_lethal_sequence(game_state)
-```
-
-### 4.2 Evaluation Function Approach
-Score each possible action:
-
-```python
-class EvaluationAgent:
-    def __init__(self):
-        self.weights = {
-            'damage_per_energy': 2.0,
-            'block_per_energy': 1.5,
-            'card_draw': 1.0,
-            'energy_gain': 2.5,
-            'debuff_value': 1.5,
-            'buff_value': 2.0
-        }
-    
-    def evaluate_action(self, game_state, action):
-        score = 0
-        # Calculate various metrics
-        if action.is_attack():
-            damage = action.calculate_damage(game_state)
-            score += damage / action.cost * self.weights['damage_per_energy']
-        # ... more evaluation logic
-        return score
-    
-    def decide_action(self, game_state):
-        possible_actions = self.get_possible_actions(game_state)
-        best_action = max(possible_actions, key=lambda a: self.evaluate_action(game_state, a))
-        return best_action
-```
-
-### 4.3 Monte Carlo Tree Search (Advanced)
-For more sophisticated decision making:
-
-```python
-class MCTSAgent:
-    def __init__(self):
-        self.simulations_per_move = 100
+    Args:
+        window_handle: Handle from find_game_windows()
         
-    def decide_action(self, game_state):
-        root = MCTSNode(game_state)
-        
-        for _ in range(self.simulations_per_move):
-            node = root
-            # Selection
-            while node.is_fully_expanded() and not node.is_terminal():
-                node = node.best_child()
-            
-            # Expansion
-            if not node.is_terminal():
-                node = node.expand()
-            
-            # Simulation
-            reward = self.simulate(node.state)
-            
-            # Backpropagation
-            while node is not None:
-                node.update(reward)
-                node = node.parent
-        
-        return root.best_action()
+    Returns:
+        Dictionary containing:
+        - 'text': Raw text content
+        - 'lines': Text split into lines
+        - 'timestamp': When the text was read
+        - 'error': Error message if reading failed
+    """
 ```
 
-### 4.4 Machine Learning Approach (Future Enhancement)
-Train a neural network on game states and optimal actions:
+**Implementation Considerations**:
+- Try multiple methods (UI Automation, Windows API, OCR)
+- Clean and normalize text (remove extra whitespace)
+- Handle encoding issues
+- Return empty result rather than crashing on errors
 
+### 3.3 Game State Reading Tool
+**Purpose**: Read all game windows and return structured game state
+
+**Tool Interface**:
 ```python
-class NeuralAgent:
-    def __init__(self, model_path):
-        self.model = load_model(model_path)
-        self.state_encoder = StateEncoder()
+def read_game_state() -> Dict[str, Any]:
+    """
+    Reads all available game windows and returns current game state.
     
-    def decide_action(self, game_state):
-        encoded_state = self.state_encoder.encode(game_state)
-        action_probs = self.model.predict(encoded_state)
-        return self.decode_action(action_probs, game_state)
+    Returns:
+        Dictionary containing:
+        - 'mode': Current game mode ('combat', 'map', 'event', 'shop', etc.)
+        - 'player': Player stats (hp, energy, gold, etc.)
+        - 'combat': Combat-specific info (enemies, hand, etc.) if in combat
+        - 'choices': Available choices/actions
+        - 'raw_windows': Raw text from each window type
+        - 'errors': List of any windows that couldn't be read
+    """
 ```
 
-## 5. System Architecture
+**Implementation Considerations**:
+- Automatically detect current game mode
+- Parse different window types appropriately
+- Provide both structured and raw data
+- Handle missing or unreadable windows gracefully
 
-### 5.1 Main Control Loop
+### 3.4 Screenshot Capture Tool
+**Purpose**: Capture screenshots of game windows for Claude to visually analyze
+
+**Tool Interface**:
+```python
+def capture_game_screenshot(window_type: str = 'all') -> Dict[str, Any]:
+    """
+    Captures screenshot(s) of game windows.
+    
+    Args:
+        window_type: 'all', 'combat', 'map', or specific window name
+        
+    Returns:
+        Dictionary containing:
+        - 'images': Dict mapping window names to image file paths
+        - 'success': Whether capture was successful
+        - 'error': Error message if failed
+    """
+```
+
+**Implementation Considerations**:
+- Save images to temporary directory
+- Include window borders for context
+- Handle overlapping windows
+- Return file paths Claude can read with its file reading capability
+
+## 4. Command Execution Tools
+
+### 4.1 Send Game Command Tool
+**Purpose**: Send a command to the game's prompt window
+
+**Tool Interface**:
+```python
+def send_game_command(command: str) -> Dict[str, Any]:
+    """
+    Sends a command to the Text the Spire prompt window.
+    
+    Args:
+        command: The command to send (e.g., 'play 0', 'end', 'choose 1')
+        
+    Returns:
+        Dictionary containing:
+        - 'success': Whether command was sent successfully
+        - 'method': Method used (direct, keyboard, clipboard)
+        - 'confirmation': Any confirmation from the game
+        - 'error': Error message if failed
+    """
+```
+
+**Implementation Considerations**:
+- Try multiple input methods in order of reliability
+- Verify prompt window is active and ready
+- Add small delay after sending for game to process
+- Validate command format before sending
+
+### 4.2 Play Card Tool
+**Purpose**: Simplified tool for playing cards in combat
+
+**Tool Interface**:
+```python
+def play_card(card_index: int, target_index: Optional[int] = None) -> Dict[str, Any]:
+    """
+    Plays a card from hand during combat.
+    
+    Args:
+        card_index: Index of card in hand (0-based)
+        target_index: Enemy index for targeted cards (0-based)
+        
+    Returns:
+        Dictionary containing:
+        - 'success': Whether card was played
+        - 'energy_used': Energy cost of the card
+        - 'new_state': Updated combat state after playing
+        - 'error': Error message if failed
+    """
+```
+
+**Implementation Considerations**:
+- Build appropriate command based on targeting
+- Verify we're in combat mode first
+- Check energy availability
+- Wait for animations and state update
+
+## 5. Game State Analysis Tools
+
+### 5.1 Parse Combat State Tool
+**Purpose**: Parse combat window text into structured data
+
+**Tool Interface**:
+```python
+def parse_combat_state(combat_text: str) -> Dict[str, Any]:
+    """
+    Parses combat window text into structured combat information.
+    
+    Args:
+        combat_text: Raw text from combat window
+        
+    Returns:
+        Dictionary containing:
+        - 'enemies': List of enemy stats and intents
+        - 'player': Player combat stats (hp, block, buffs/debuffs)
+        - 'hand': List of playable cards with costs
+        - 'energy': Current/max energy
+        - 'draw_pile_count': Number of cards in draw pile
+        - 'discard_pile_count': Number of cards in discard pile
+        - 'turn': Current turn number
+    """
+```
+
+**Implementation Considerations**:
+- Use regex patterns for reliable parsing
+- Handle variable enemy counts
+- Parse buff/debuff stacks correctly
+- Include intent interpretation
+
+### 5.2 Parse Map State Tool
+**Purpose**: Parse map window to understand navigation options
+
+**Tool Interface**:
+```python
+def parse_map_state(map_text: str) -> Dict[str, Any]:
+    """
+    Parses map window text into structured map information.
+    
+    Args:
+        map_text: Raw text from map window
+        
+    Returns:
+        Dictionary containing:
+        - 'current_floor': Current floor number
+        - 'act': Current act (1, 2, or 3)
+        - 'available_paths': List of available next nodes
+        - 'node_types': Types of each available node (combat, elite, etc.)
+        - 'boss_name': Name of act boss if visible
+    """
+```
+
+### 5.3 Parse Event/Shop Tool
+**Purpose**: Parse event and shop windows for available choices
+
+**Tool Interface**:
+```python
+def parse_choices(window_text: str, window_type: str) -> Dict[str, Any]:
+    """
+    Parses event, shop, or choice windows.
+    
+    Args:
+        window_text: Raw text from window
+        window_type: Type of window ('event', 'shop', 'card_reward', etc.)
+        
+    Returns:
+        Dictionary containing:
+        - 'description': Event/shop description text
+        - 'choices': List of available choices with costs/effects
+        - 'can_skip': Whether skip/leave is available
+        - 'gold_available': Player's current gold (for shops)
+    """
+```
+
+## 6. Helper and Analysis Tools
+
+### 6.1 Card Analysis Tool
+**Purpose**: Provide detailed analysis of cards for Claude's decision making
+
+**Tool Interface**:
+```python
+def analyze_card(card_name: str, upgraded: bool = False) -> Dict[str, Any]:
+    """
+    Provides detailed information about a specific card.
+    
+    Args:
+        card_name: Name of the card
+        upgraded: Whether the card is upgraded
+        
+    Returns:
+        Dictionary containing:
+        - 'cost': Energy cost
+        - 'type': Attack, Skill, or Power
+        - 'damage': Damage dealt (if applicable)
+        - 'block': Block gained (if applicable)
+        - 'effects': List of special effects
+        - 'exhausts': Whether card exhausts
+        - 'targets': Whether card needs a target
+    """
+```
+
+### 6.2 Combat Simulation Tool
+**Purpose**: Simulate outcomes of card plays for Claude's planning
+
+**Tool Interface**:
+```python
+def simulate_card_play(card_index: int, target_index: Optional[int], 
+                      current_state: Dict) -> Dict[str, Any]:
+    """
+    Simulates the outcome of playing a specific card.
+    
+    Args:
+        card_index: Index of card to play
+        target_index: Target enemy index (if applicable)
+        current_state: Current combat state from parse_combat_state()
+        
+    Returns:
+        Dictionary containing:
+        - 'damage_dealt': Damage to each enemy
+        - 'block_gained': Block gained by player
+        - 'energy_remaining': Energy after playing
+        - 'card_draws': Number of cards drawn
+        - 'buffs_applied': New buffs/debuffs
+        - 'valid_play': Whether the play is legal
+    """
+```
+
+## 7. Tool Coordination and State Management
+
+### 7.1 Session Manager Tool
+**Purpose**: Initialize and manage a game session
+
+**Tool Interface**:
+```python
+def initialize_session() -> Dict[str, Any]:
+    """
+    Initializes a new game session and discovers windows.
+    
+    Returns:
+        Dictionary containing:
+        - 'session_id': Unique session identifier
+        - 'windows_found': List of discovered windows
+        - 'game_running': Whether game is detected
+        - 'initial_state': Initial game state
+    """
+
+def get_current_mode() -> str:
+    """
+    Quickly checks the current game mode.
+    
+    Returns:
+        String indicating mode: 'combat', 'map', 'event', 'shop', 
+        'card_reward', 'rest', 'game_over', or 'unknown'
+    """
+```
+
+### 7.2 History Tracking Tool
+**Purpose**: Track game progression for Claude's context
+
+**Tool Interface**:
+```python
+def add_to_history(action: str, result: Dict[str, Any]) -> None:
+    """
+    Records an action and its result for future reference.
+    
+    Args:
+        action: The command or action taken
+        result: The outcome of the action
+    """
+
+def get_recent_history(num_entries: int = 10) -> List[Dict[str, Any]]:
+    """
+    Retrieves recent game history.
+    
+    Args:
+        num_entries: Number of recent entries to return
+        
+    Returns:
+        List of history entries with actions and results
+    """
+```
+
+### 7.3 Wait for State Change Tool
+**Purpose**: Wait for game animations and state updates
+
+**Tool Interface**:
+```python
+def wait_for_update(expected_change: str = 'any', timeout: float = 5.0) -> Dict[str, Any]:
+    """
+    Waits for game state to change after an action.
+    
+    Args:
+        expected_change: Type of change to wait for ('combat_end', 'new_turn', etc.)
+        timeout: Maximum time to wait in seconds
+        
+    Returns:
+        Dictionary containing:
+        - 'changed': Whether a change was detected
+        - 'new_mode': New game mode if changed
+        - 'time_waited': Actual time waited
+    """
+```
+
+## 8. Tool Implementation Architecture
+
+### 8.1 Tool Registry and Interface
 
 ```python
-class STSAgent:
+class STSToolkit:
+    """
+    Main interface for Claude Code to interact with Slay the Spire.
+    All tools are accessible through this single class.
+    """
+    
     def __init__(self):
         self.window_manager = WindowManager()
-        self.state_manager = GameStateManager()
-        self.decision_engine = EvaluationAgent()
         self.command_sender = CommandSender()
-        self.running = False
+        self.parser = StateParser()
+        self.session_active = False
     
-    def run(self):
-        self.running = True
-        self.initialize_windows()
-        
-        while self.running:
-            try:
-                # Read all windows
-                window_texts = self.window_manager.read_all_windows()
-                
-                # Update game state
-                game_state = self.state_manager.update_from_windows(window_texts)
-                
-                # Make decision
-                action = self.decision_engine.decide_action(game_state)
-                
-                # Execute action
-                if action:
-                    self.command_sender.send_command(action)
-                
-                # Wait for game to process
-                time.sleep(0.5)
-                
-            except Exception as e:
-                self.handle_error(e)
+    # Window and State Reading Tools
+    def find_game_windows(self) -> List[Dict[str, Any]]:
+        """Find all Text the Spire windows"""
+        return self.window_manager.discover_windows()
+    
+    def read_game_state(self) -> Dict[str, Any]:
+        """Read current game state from all windows"""
+        return self.window_manager.read_all_windows()
+    
+    # Command Tools
+    def send_command(self, command: str) -> Dict[str, Any]:
+        """Send a command to the game"""
+        return self.command_sender.send(command)
+    
+    def play_card(self, card_index: int, target: Optional[int] = None) -> Dict[str, Any]:
+        """Play a card from hand"""
+        cmd = f"play {card_index}"
+        if target is not None:
+            cmd += f" {target}"
+        return self.send_command(cmd)
+    
+    # Analysis Tools
+    def parse_combat_state(self, combat_text: str) -> Dict[str, Any]:
+        """Parse combat window text"""
+        return self.parser.parse_combat(combat_text)
+    
+    def analyze_card(self, card_name: str, upgraded: bool = False) -> Dict[str, Any]:
+        """Get detailed card information"""
+        return self.parser.get_card_info(card_name, upgraded)
 ```
 
-### 5.2 Error Handling and Recovery
+### 8.2 Error Handling Strategy
 
 ```python
-class ErrorHandler:
-    def __init__(self):
-        self.error_count = {}
-        self.recovery_strategies = {
-            'window_not_found': self.recover_window,
-            'parse_error': self.recover_parse,
-            'command_failed': self.retry_command
-        }
-    
-    def handle_error(self, error_type, error, context):
-        self.error_count[error_type] = self.error_count.get(error_type, 0) + 1
-        
-        if self.error_count[error_type] > 5:
-            raise Exception(f"Too many {error_type} errors")
-        
-        recovery = self.recovery_strategies.get(error_type)
-        if recovery:
-            return recovery(error, context)
+def safe_tool_wrapper(func):
+    """
+    Decorator to ensure tools always return valid responses, even on error.
+    """
+    def wrapper(*args, **kwargs):
+        try:
+            result = func(*args, **kwargs)
+            return {
+                'success': True,
+                'data': result,
+                'error': None
+            }
+        except Exception as e:
+            return {
+                'success': False,
+                'data': None,
+                'error': str(e),
+                'error_type': type(e).__name__
+            }
+    return wrapper
 ```
 
-## 6. Challenges and Solutions
+## 9. Implementation Challenges and Solutions
 
-### 6.1 Window Management Challenges
+### 9.1 Window Detection Reliability
 
-**Challenge**: Windows may move, resize, or be obscured.
+**Challenge**: Text the Spire windows may not be consistently detectable.
 
 **Solutions**:
-- Store window handles, not positions
-- Implement window tracking and re-discovery
-- Use window bring-to-front before reading
-- Implement position validation
+- Try multiple detection methods (window title, class name, process)
+- Cache window handles once found
+- Provide manual window selection as fallback
+- Include diagnostic tool to list all windows
 
 ```python
-class WindowTracker:
-    def __init__(self):
-        self.windows = {}
-        self.last_positions = {}
+def diagnose_windows() -> Dict[str, Any]:
+    """
+    Diagnostic tool to help Claude understand window detection issues.
     
-    def validate_windows(self):
-        for name, hwnd in self.windows.items():
-            if not win32gui.IsWindow(hwnd):
-                self.rediscover_window(name)
-            elif self.has_moved(hwnd):
-                self.update_position(hwnd)
+    Returns:
+        Dictionary containing:
+        - 'all_windows': List of all visible windows
+        - 'game_process': Whether Slay the Spire process is running
+        - 'potential_matches': Windows that might be game windows
+        - 'recommendations': Suggested fixes
+    """
 ```
 
-### 6.2 Text Parsing Challenges
+### 9.2 Text Extraction Accuracy
 
-**Challenge**: Text format may vary, special characters, incomplete updates.
+**Challenge**: Window text may not be readable through standard APIs.
 
 **Solutions**:
-- Robust regex patterns with fallbacks
-- Fuzzy string matching for card/relic names
-- State validation and sanity checks
-- Incremental parsing with error recovery
+- Implement multiple extraction methods:
+  1. UI Automation API
+  2. Windows Messages
+  3. OCR as last resort
+- Return confidence scores with extracted text
+- Provide raw and cleaned versions of text
+- Include screenshot tool for Claude to verify
 
-```python
-class RobustParser:
-    def parse_with_fallback(self, text, patterns):
-        for pattern in patterns:
-            try:
-                match = re.search(pattern, text)
-                if match:
-                    return match.groups()
-            except:
-                continue
-        return None
-    
-    def fuzzy_match_card(self, card_text, known_cards):
-        from difflib import get_close_matches
-        matches = get_close_matches(card_text, known_cards, n=1, cutoff=0.8)
-        return matches[0] if matches else None
-```
+### 9.3 Command Timing and Confirmation
 
-### 6.3 Timing and Synchronization
-
-**Challenge**: Game animations, state transitions, command processing delays.
+**Challenge**: Commands may fail or take variable time to process.
 
 **Solutions**:
-- Implement state change detection
-- Adaptive waiting based on action type
-- Command confirmation through state changes
-- Animation skip commands when available
+- Implement intelligent wait times based on command type
+- Check for state changes to confirm command execution
+- Provide retry mechanism with backoff
+- Return detailed status for each command
 
 ```python
-class TimingManager:
-    def __init__(self):
-        self.action_delays = {
-            'play_card': 1.0,
-            'end_turn': 2.0,
-            'potion': 0.5,
-            'choice': 0.3
-        }
+def send_command_with_confirmation(command: str, 
+                                  expected_change: str = None,
+                                  max_retries: int = 3) -> Dict[str, Any]:
+    """
+    Sends command and waits for confirmation.
     
-    def wait_for_state_change(self, old_state, timeout=5):
-        start_time = time.time()
-        while time.time() - start_time < timeout:
-            new_state = self.read_current_state()
-            if self.has_changed(old_state, new_state):
-                return True
-            time.sleep(0.1)
-        return False
+    Returns:
+        Dictionary containing:
+        - 'sent': Whether command was sent
+        - 'confirmed': Whether expected change occurred
+        - 'retries': Number of retries needed
+        - 'final_state': State after command execution
+    """
 ```
 
-### 6.4 Complex Game States
+### 9.4 State Parsing Robustness
 
-**Challenge**: Events with multiple choices, complex card interactions, deck building.
+**Challenge**: Game text format may vary or contain unexpected content.
 
 **Solutions**:
-- State machine for different game modes
-- Context-aware parsing
-- History tracking for multi-step decisions
-- Specialized handlers for each game mode
+- Use flexible regex patterns with named groups
+- Implement fuzzy matching for card and relic names
+- Return partial results when full parsing fails
+- Include raw text in all responses for Claude to analyze
 
 ```python
-class GameModeHandler:
-    def __init__(self):
-        self.handlers = {
-            'combat': CombatHandler(),
-            'map': MapHandler(),
-            'shop': ShopHandler(),
-            'event': EventHandler(),
-            'card_reward': CardRewardHandler(),
-            'rest': RestHandler()
-        }
+def parse_with_fallback(text: str, parser_type: str) -> Dict[str, Any]:
+    """
+    Attempts to parse text with multiple strategies.
     
-    def handle_current_mode(self, game_state):
-        mode = self.detect_game_mode(game_state)
-        handler = self.handlers.get(mode)
-        if handler:
-            return handler.handle(game_state)
+    Returns:
+        Dictionary containing:
+        - 'parsed': Structured data (may be partial)
+        - 'confidence': Confidence score (0-1)
+        - 'raw_text': Original text for Claude's analysis
+        - 'warnings': List of parsing issues encountered
+    """
 ```
 
-## 7. Implementation Roadmap
+## 10. Implementation Roadmap
 
-### Phase 1: Basic Infrastructure (Week 1-2)
-1. Window detection and text extraction
-2. Basic game state parsing
-3. Simple command sending
-4. Logging and debugging framework
+### Phase 1: Core Tool Infrastructure (Priority 1)
+1. **Window Detection Tools**
+   - `find_game_windows()` - Locate all Text the Spire windows
+   - `read_window_text()` - Extract text from specific windows
+   - `capture_game_screenshot()` - Capture window images
 
-### Phase 2: Core Gameplay (Week 3-4)
-1. Complete combat state parsing
-2. Basic combat decision making
-3. Card play execution
-4. Turn management
+2. **Basic Command Tools**
+   - `send_game_command()` - Send commands to prompt window
+   - `wait_for_update()` - Wait for game state changes
 
-### Phase 3: Advanced Features (Week 5-6)
-1. Map navigation
-2. Shop interactions
-3. Event handling
-4. Deck building decisions
+### Phase 2: Game State Tools (Priority 2)
+1. **State Reading Tools**
+   - `read_game_state()` - Comprehensive state reading
+   - `get_current_mode()` - Detect current game mode
 
-### Phase 4: Optimization (Week 7-8)
-1. Decision algorithm improvements
-2. Performance optimization
-3. Error recovery enhancement
-4. Configuration system
+2. **Parsing Tools**
+   - `parse_combat_state()` - Parse combat information
+   - `parse_map_state()` - Parse map navigation options
+   - `parse_choices()` - Parse events, shops, and choices
 
-### Phase 5: Machine Learning (Optional, Week 9+)
-1. Data collection system
-2. State encoding
-3. Model training pipeline
-4. Neural network integration
+### Phase 3: Specialized Tools (Priority 3)
+1. **Combat Tools**
+   - `play_card()` - Simplified card playing
+   - `use_potion()` - Potion usage
+   - `end_turn()` - End turn command
 
-## 8. Development Best Practices
+2. **Analysis Tools**
+   - `analyze_card()` - Card information lookup
+   - `simulate_card_play()` - Basic outcome prediction
+   - `get_available_actions()` - List valid actions
 
-### 8.1 Modular Design
-- Separate window management from game logic
-- Abstract decision making from state parsing
-- Plugin architecture for different agents
+### Phase 4: Enhancement Tools (Priority 4)
+1. **Session Management**
+   - `initialize_session()` - Setup game connection
+   - `save_game_state()` - Save state for analysis
+   - `load_game_state()` - Load previous state
 
-### 8.2 Testing Strategy
-- Unit tests for parsers
-- Integration tests with mock windows
-- Record and replay game states
-- Performance benchmarking
+2. **Diagnostic Tools**
+   - `diagnose_windows()` - Debug window issues
+   - `test_commands()` - Verify command sending
+   - `validate_parsing()` - Check parser accuracy
 
-### 8.3 Configuration Management
+## 11. Tool Design Best Practices
+
+### 11.1 Tool Interface Guidelines
+- **Single Responsibility**: Each tool does one thing well
+- **Clear Return Values**: Always return structured dictionaries
+- **Error Transparency**: Include error details for Claude to understand
+- **Stateless Design**: Tools shouldn't maintain state between calls
+- **Consistent Naming**: Use clear, descriptive function names
+
+### 11.2 Return Value Standards
 ```python
-# config.yaml
-window_detection:
-  method: "ui_automation"  # or "ocr", "windows_api"
-  retry_attempts: 3
-  
-parsing:
-  fuzzy_match_threshold: 0.8
-  validation_enabled: true
-  
-agent:
-  type: "evaluation"  # or "rules", "mcts", "neural"
-  thinking_time: 1.0
-  
-logging:
-  level: "debug"
-  file: "sts_agent.log"
+# Standard return format for all tools
+{
+    'success': bool,          # Whether the operation succeeded
+    'data': Any,             # The actual result data
+    'error': str,            # Error message if failed
+    'warnings': List[str],   # Non-fatal issues
+    'raw_data': Any,         # Original/unprocessed data
+    'metadata': Dict         # Additional context
+}
 ```
 
-### 8.4 Debugging Tools
-- Screenshot capture on errors
-- State history replay
-- Decision explanation system
-- Performance profiling
+### 11.3 Tool Documentation
+Each tool should include:
+- Clear purpose statement
+- Parameter descriptions with types
+- Return value structure
+- Example usage
+- Common error scenarios
 
-## 9. Example Implementation Structure
+### 11.4 Testing Approach
+- Mock game windows for unit tests
+- Record real game states for integration tests
+- Test error conditions explicitly
+- Verify tool isolation (no side effects)
+
+## 12. Example Implementation Structure
 
 ```
-sts-agent/
+sts-tools/
 ├── src/
-│   ├── window_management/
+│   ├── core/
 │   │   ├── __init__.py
-│   │   ├── window_detector.py
-│   │   ├── text_extractor.py
-│   │   └── ocr_fallback.py
-│   ├── parsing/
+│   │   ├── toolkit.py          # Main STSToolkit class
+│   │   ├── exceptions.py       # Custom exceptions
+│   │   └── constants.py        # Game constants
+│   ├── window_tools/
 │   │   ├── __init__.py
-│   │   ├── state_parser.py
-│   │   ├── combat_parser.py
-│   │   ├── map_parser.py
-│   │   └── card_database.py
-│   ├── game_state/
+│   │   ├── window_finder.py    # Window discovery
+│   │   ├── text_reader.py      # Text extraction
+│   │   ├── screenshot.py       # Screenshot capture
+│   │   └── ocr_fallback.py     # OCR backup method
+│   ├── command_tools/
 │   │   ├── __init__.py
-│   │   ├── models.py
-│   │   ├── state_manager.py
-│   │   └── validators.py
-│   ├── agents/
+│   │   ├── command_sender.py   # Send commands
+│   │   ├── action_helpers.py   # High-level actions
+│   │   └── timing.py           # Wait and sync tools
+│   ├── parsing_tools/
 │   │   ├── __init__.py
-│   │   ├── base_agent.py
-│   │   ├── rule_agent.py
-│   │   ├── evaluation_agent.py
-│   │   └── mcts_agent.py
-│   ├── command_execution/
+│   │   ├── combat_parser.py    # Combat state parsing
+│   │   ├── map_parser.py       # Map parsing
+│   │   ├── event_parser.py     # Event/shop parsing
+│   │   └── card_database.py    # Card information
+│   ├── analysis_tools/
 │   │   ├── __init__.py
-│   │   ├── command_sender.py
-│   │   └── action_translator.py
-│   └── main.py
+│   │   ├── card_analyzer.py    # Card analysis
+│   │   ├── combat_simulator.py # Simple simulation
+│   │   └── state_validator.py  # State validation
+│   └── utils/
+│       ├── __init__.py
+│       ├── logging.py          # Logging utilities
+│       ├── config.py           # Configuration
+│       └── helpers.py          # Common utilities
 ├── tests/
-├── config/
-├── logs/
+│   ├── test_window_tools.py
+│   ├── test_parsers.py
+│   ├── test_commands.py
+│   └── fixtures/               # Test data
+├── examples/
+│   ├── basic_usage.py          # Simple examples
+│   └── claude_integration.py   # How Claude uses tools
+├── docs/
+│   ├── tool_reference.md       # Complete tool docs
+│   └── troubleshooting.md      # Common issues
 └── README.md
 ```
 
-## 10. Conclusion
+## 13. Example Tool Usage by Claude Code
 
-This plan provides a comprehensive approach to building a Slay the Spire agent using the Text the Spire mod. The modular architecture allows for iterative development and easy swapping of different components. Starting with basic window reading and rule-based decisions, the system can evolve to use more sophisticated algorithms and even machine learning approaches.
+### 13.1 Basic Combat Turn
+```python
+# Claude would use tools like this:
+toolkit = STSToolkit()
 
-Key success factors:
-1. Robust window and text handling
-2. Accurate game state parsing
-3. Flexible decision-making architecture
-4. Good error handling and recovery
-5. Iterative development approach
+# Read current state
+state = toolkit.read_game_state()
+if state['mode'] == 'combat':
+    combat = toolkit.parse_combat_state(state['raw_windows']['combat'])
+    
+    # Analyze options
+    for i, card in enumerate(combat['hand']):
+        card_info = toolkit.analyze_card(card['name'])
+        # Claude reasons about the card...
+    
+    # Play a card
+    result = toolkit.play_card(0, target=1)
+    
+    # Wait for animation
+    toolkit.wait_for_update('animation_complete')
+```
 
-The proposed solution balances complexity with practicality, providing a clear path from a basic working agent to a sophisticated AI player.
+### 13.2 Map Navigation
+```python
+# Read map state
+map_state = toolkit.parse_map_state(state['raw_windows']['map'])
+
+# Claude analyzes paths and chooses
+choice = 2  # Claude's decision
+result = toolkit.send_command(f'choose {choice}')
+```
+
+### 13.3 Event Handling
+```python
+# Parse event choices
+event = toolkit.parse_choices(state['raw_windows']['event'], 'event')
+
+# Claude reads options and decides
+for i, choice in enumerate(event['choices']):
+    print(f"Option {i}: {choice['text']} - Cost: {choice['cost']}")
+    
+# Make choice
+toolkit.send_command('choose 0')
+```
+
+## 14. Conclusion
+
+This plan outlines a tool-based approach that enables Claude Code to play Slay the Spire effectively. By focusing on reliable tools with clean interfaces, we allow Claude to leverage its reasoning capabilities while handling the technical complexity of game interaction.
+
+Key principles:
+1. **Tool Simplicity**: Each tool has a single, clear purpose
+2. **Reliable Interaction**: Robust window detection and command sending
+3. **Transparent Errors**: Claude can understand and work around issues
+4. **Structured Data**: Parse game state into Claude-friendly formats
+5. **No Hidden Logic**: All decisions are made by Claude, not the tools
+
+The implementation should prioritize reliability and clarity over optimization, creating a toolkit that Claude can use naturally to play the game at a high level.
