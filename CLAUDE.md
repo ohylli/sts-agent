@@ -48,7 +48,8 @@ Currently in **Phase 1**: Feasibility Testing
 - **Section 3 Complete**: Text Window Reading (pywinauto approach) ✅
 - **Key Findings**: Window handles stable during gameplay; pywinauto successfully extracts formatted game state at 25k chars/sec
 - **Main Outputs**: `scripts/reliable_window_finder.py`, `tests/pywinauto_text_extraction.py`, `tests/pywinauto_detailed_text.py`
-- **Next**: Section 4 - Windows API approach comparison
+- **conclusion**: Since section 3 was a great success we will skip 4. Text Window Reading - Windows API Approach for now at least
+- **Next**: Section 5. Text the Spire Command Input Testing
 
 See `docs/window_documentation.md` and `docs/pywinauto_findings.md` for detailed findings and implementation guidance.
 

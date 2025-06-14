@@ -70,8 +70,8 @@ Phase 1 focuses on proving the basic technical feasibility of interacting with S
 - [ ] Handle window scrolling if applicable (SKIPPED for now)
 
 ### 4. Text Window Reading - Windows API Approach
-**Priority: High**
-**Status: Pending**
+**Priority: Low**
+**Status: Skip for now since previous step was a great success**
 
 #### 4.1 Direct API Text Reading
 - [ ] Create script using win32api to find Text the Spire windows
