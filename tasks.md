@@ -1,13 +1,14 @@
 # Phase 1: Feasibility Testing - Task Plan
 
 ## Overview
-Phase 1 focuses on proving the basic technical feasibility of interacting with Slay the Spire through window reading and command input. The goal is to identify the most reliable approach for building the agent.
+Phase 1 focuses on proving the basic technical feasibility of interacting with Slay the Spire through the "Text the Spire" mod. This mod provides text windows showing game state and a prompt window for entering commands. We will ONLY interact with these Text the Spire windows - NOT the game's native UI. The goal is to identify the most reliable approach for reading text windows and sending commands.
 
 ## Success Criteria
-- Successfully read game state from Slay the Spire windows
-- Successfully send commands through the prompt window
-- Identify the most reliable technical approach
+- Successfully read game state from Text the Spire's text windows
+- Successfully send commands through Text the Spire's prompt window
+- Identify the most reliable technical approach for text window interaction
 - Document pros/cons of each method tested
+- Confirm we can interact WITHOUT touching the game's native UI
 
 ## Task List
 
@@ -18,12 +19,13 @@ Phase 1 focuses on proving the basic technical feasibility of interacting with S
 #### 1.1 Install Required Tools
 - [X] Install Python 3.8+ with virtual environment
 - [X] Install Slay the Spire (Steam version)
+- [ ] Install Text the Spire mod (provides text windows for accessibility)
 - [X] Install development tools (VS Code, Git)
 - [ ] Set up project directory structure
 
 #### 1.2 Install Testing Libraries
-- [ ] Install pywinauto for UI Automation
-- [ ] Install win32api/pywin32 for Windows API
+- [ ] Install pywinauto for text window reading
+- [ ] Install win32api/pywin32 for Windows API text reading
 - [ ] Create requirements.txt with all dependencies
 
 
@@ -33,10 +35,11 @@ Phase 1 focuses on proving the basic technical feasibility of interacting with S
 
 #### 2.1 Basic Window Finding
 - [ ] Write script to enumerate all windows using win32api
-- [ ] Write script to find Slay the Spire main window
-- [ ] Write script to find prompt/console window
+- [ ] Write script to find Text the Spire text windows (game state windows)
+- [ ] Write script to find Text the Spire prompt window (command input)
 - [ ] Test window detection with game running/not running
-- [ ] Document window class names and titles
+- [ ] Document Text the Spire window class names and titles
+- [ ] Count and identify all Text the Spire windows
 
 #### 2.2 Window Handle Persistence
 - [ ] Test if window handles remain stable across game sessions
@@ -44,53 +47,55 @@ Phase 1 focuses on proving the basic technical feasibility of interacting with S
 - [ ] Create reliable window finder function
 - [ ] Add error handling for missing windows
 
-### 3. UI Automation Approach Testing
+### 3. Text Window Reading - Pywinauto Approach
 **Priority: High**
 **Status: Pending**
 
-#### 3.1 Pywinauto Integration
-- [ ] Create script to connect to Slay the Spire using pywinauto
-- [ ] Test reading window titles and basic properties
-- [ ] Attempt to read UI element tree
-- [ ] Test if game UI elements are accessible
+#### 3.1 Text the Spire Window Connection
+- [ ] Create script to connect to Text the Spire windows using pywinauto
+- [ ] Identify all Text the Spire text windows
+- [ ] Test reading window titles and properties
+- [ ] Verify we can access text content, NOT game UI
 
-#### 3.2 Control Identification
-- [ ] Map out accessible UI controls in main menu
-- [ ] Map out accessible UI controls during gameplay
-- [ ] Test reading text from UI elements
-- [ ] Document which elements are/aren't accessible
+#### 3.2 Text Content Extraction
+- [ ] Test reading text from Text the Spire game state windows
+- [ ] Test different methods to extract window text content
+- [ ] Handle multi-line text and formatting
+- [ ] Document text extraction success rates
 
-#### 3.3 Interaction Testing
-- [ ] Test clicking UI elements programmatically
-- [ ] Test keyboard input to game window
-- [ ] Test focus management between windows
-- [ ] Measure response time and reliability
+#### 3.3 Text Window Monitoring
+- [ ] Test detecting when text windows update
+- [ ] Test reading from multiple Text the Spire windows
+- [ ] Measure text reading latency and reliability
+- [ ] Handle window scrolling if applicable
 
-### 4. Windows API Approach Testing
+### 4. Text Window Reading - Windows API Approach
 **Priority: High**
 **Status: Pending**
 
-#### 4.1 Direct API Integration
-- [ ] Create script using win32api for window manipulation
-- [ ] Test GetWindowText and related functions
-- [ ] Test SendMessage/PostMessage for input
-- [ ] Test window positioning and sizing
+#### 4.1 Direct API Text Reading
+- [ ] Create script using win32api to find Text the Spire windows
+- [ ] Test GetWindowText on Text the Spire windows
+- [ ] Test alternative text reading methods (WM_GETTEXT, etc.)
+- [ ] Compare text extraction quality with pywinauto
 
-### 5. Command Input Testing
+### 5. Text the Spire Command Input Testing
 **Priority: High**
 **Status: Pending**
 
 #### 5.1 Prompt Window Interaction
-- [ ] Test finding and focusing prompt window
-- [ ] Test sending text to prompt using pywinauto
-- [ ] Test sending text using Windows API
-- [ ] Test command execution and response reading
+- [ ] Test finding and focusing Text the Spire prompt window
+- [ ] Test sending text commands using pywinauto
+- [ ] Test sending text commands using Windows API
+- [ ] Test command execution and response detection
+- [ ] Verify commands affect game state (via text window updates)
 
 #### 5.2 Input Reliability
-- [ ] Test rapid command sequences
+- [ ] Test rapid command sequences to Text the Spire
 - [ ] Test command buffering/queuing
 - [ ] Handle prompt window clearing/scrolling
 - [ ] Measure input latency and success rate
+- [ ] Test error handling for invalid commands
 
 ### 6. Integration Testing
 **Priority: Medium**
@@ -102,11 +107,11 @@ Phase 1 focuses on proving the basic technical feasibility of interacting with S
 - [ ] Measure end-to-end latency
 - [ ] Test stability over extended periods
 
-#### 6.2 Game State Parsing
-- [ ] Create parser for main menu state
-- [ ] Create parser for combat state
-- [ ] Create parser for map/event states
-- [ ] Test state detection accuracy
+#### 6.2 Text the Spire Output Parsing
+- [ ] Create parser for Text the Spire main menu text
+- [ ] Create parser for Text the Spire combat state text
+- [ ] Create parser for Text the Spire map/event text
+- [ ] Test state detection accuracy from text windows
 
 
 ### 7. Documentation and Decision
@@ -133,22 +138,39 @@ Phase 1 focuses on proving the basic technical feasibility of interacting with S
 
 ## Notes
 
+### Important: Text the Spire Interaction Model
+**We are NOT automating the game's native UI.** The Text the Spire mod provides:
+- Multiple text windows displaying game state information
+- A prompt window for entering text commands
+
+Our agent will ONLY:
+1. Read text from Text the Spire's game state windows
+2. Send commands to Text the Spire's prompt window
+
+We will NOT:
+- Click on game buttons or UI elements
+- Interact with game menus directly
+- Automate any part of the game's native interface
+
 ### Testing Priority
-1. Start with UI Automation as it's most likely to work
-2. Test Windows API in parallel for comparison
-3. Focus on reliability over performance initially
+1. Start by identifying all Text the Spire windows
+2. Test both pywinauto and Windows API for text reading
+3. Focus on reliable text extraction from Text the Spire windows
+4. Ensure command input works through Text the Spire prompt
+5. Never attempt to automate the game's native UI
 
 ### Key Metrics to Track
-- Success rate of reading game state
-- Accuracy of parsed information
-- Latency of read/write operations
-- Stability over time
+- Success rate of reading text from Text the Spire windows
+- Accuracy of parsed Text the Spire output
+- Latency of text reading operations
+- Command input success rate via Text the Spire prompt
+- Stability of Text the Spire window handles over time
 - Resource usage
 
 
 ## Next Steps After Phase 1
 Based on the findings from this phase:
-1. Select primary technical approach
-2. Design agent architecture
-3. Begin Phase 2: Core game state parsing
-4. Develop command abstraction layer
+1. Select primary technical approach for Text the Spire interaction
+2. Design agent architecture around text-based communication
+3. Begin Phase 2: Core Text the Spire output parsing
+4. Develop command abstraction layer for Text the Spire prompt
