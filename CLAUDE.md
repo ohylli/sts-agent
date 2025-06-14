@@ -48,6 +48,13 @@ Currently in **Phase 1**: Feasibility Testing
 - Approach: Test pywinauto and win32api for text window interaction
 - Next: Evaluate approaches and select the most reliable
 
+## Directory Structure
+
+- `src/` - Core toolkit modules (window detection, text extraction, command sending, parsers)
+- `tests/` - Phase 1 testing scripts (pywinauto vs win32api, reliability tests, integration tests)
+- `scripts/` - Standalone utilities (window enumeration, manual testing, performance tools)
+- `docs/` - Technical findings, mod documentation, API design notes, metrics
+
 ## Key Files
 
 - `plan.md`: Complete technical design and implementation plan

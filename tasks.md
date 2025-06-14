@@ -19,13 +19,13 @@ Phase 1 focuses on proving the basic technical feasibility of interacting with S
 #### 1.1 Install Required Tools
 - [X] Install Python 3.8+ with virtual environment
 - [X] Install Slay the Spire (Steam version)
-- [ ] Install Text the Spire mod (provides text windows for accessibility)
+- [X] Install Text the Spire mod (provides text windows for accessibility)
 - [X] Install development tools (VS Code, Git)
-- [ ] Set up project directory structure
+- [X] Set up project directory structure
 
 #### 1.2 Install Testing Libraries
-- [ ] Install pywinauto for text window reading
-- [ ] Install win32api/pywin32 for Windows API text reading
+- [X] Install pywinauto for text window reading
+- [X] Install win32api/pywin32 for Windows API text reading
 - [ ] Create requirements.txt with all dependencies
 
 
