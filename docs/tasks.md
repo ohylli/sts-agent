@@ -49,25 +49,25 @@ Phase 1 focuses on proving the basic technical feasibility of interacting with S
 
 ### 3. Text Window Reading - Pywinauto Approach
 **Priority: High**
-**Status: Pending**
+**Status: Mostly Complete (3.3 skipped for now)**
 
 #### 3.1 Text the Spire Window Connection
-- [ ] Create script to connect to Text the Spire windows using pywinauto
-- [ ] Identify all Text the Spire text windows
-- [ ] Test reading window titles and properties
-- [ ] Verify we can access text content, NOT game UI
+- [X] Create script to connect to Text the Spire windows using pywinauto
+- [X] Identify all Text the Spire text windows
+- [X] Test reading window titles and properties
+- [X] Verify we can access text content, NOT game UI
 
 #### 3.2 Text Content Extraction
-- [ ] Test reading text from Text the Spire game state windows
-- [ ] Test different methods to extract window text content
-- [ ] Handle multi-line text and formatting
-- [ ] Document text extraction success rates
+- [X] Test reading text from Text the Spire game state windows
+- [X] Test different methods to extract window text content
+- [X] Handle multi-line text and formatting
+- [X] Document text extraction success rates
 
 #### 3.3 Text Window Monitoring
-- [ ] Test detecting when text windows update
-- [ ] Test reading from multiple Text the Spire windows
-- [ ] Measure text reading latency and reliability
-- [ ] Handle window scrolling if applicable
+- [ ] Test detecting when text windows update (SKIPPED for now)
+- [ ] Test reading from multiple Text the Spire windows (SKIPPED for now)
+- [ ] Measure text reading latency and reliability (SKIPPED for now)
+- [ ] Handle window scrolling if applicable (SKIPPED for now)
 
 ### 4. Text Window Reading - Windows API Approach
 **Priority: High**

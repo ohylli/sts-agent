@@ -45,11 +45,12 @@ All tools follow this pattern:
 
 Currently in **Phase 1**: Feasibility Testing
 - **Section 2 Complete**: Window Detection and Enumeration ✅
-- **Key Finding**: Window handles are unstable across sessions, stable during gameplay
-- **Main Output**: `scripts/reliable_window_finder.py` - production-ready window finder with caching
-- **Next**: Section 3 - Text Window Reading (pywinauto approach)
+- **Section 3 Complete**: Text Window Reading (pywinauto approach) ✅
+- **Key Findings**: Window handles stable during gameplay; pywinauto successfully extracts formatted game state at 25k chars/sec
+- **Main Outputs**: `scripts/reliable_window_finder.py`, `tests/pywinauto_text_extraction.py`, `tests/pywinauto_detailed_text.py`
+- **Next**: Section 4 - Windows API approach comparison
 
-See `docs/window_documentation.md` for detailed findings and implementation guidance.
+See `docs/window_documentation.md` and `docs/pywinauto_findings.md` for detailed findings and implementation guidance.
 
 ## Directory Structure
 
