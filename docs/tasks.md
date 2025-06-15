@@ -81,21 +81,21 @@ Phase 1 focuses on proving the basic technical feasibility of interacting with S
 
 ### 5. Text the Spire Command Input Testing
 **Priority: High**
-**Status: Pending**
+**Status: IN progress**
 
 #### 5.1 Prompt Window Interaction
-- [ ] Test finding and focusing Text the Spire prompt window
-- [ ] Test sending text commands using pywinauto
-- [ ] Test sending text commands using Windows API
-- [ ] Test command execution and response detection
-- [ ] Verify commands affect game state (via text window updates)
+- [X] Test finding and focusing Text the Spire prompt window
+- [X] Test sending text commands using pywinauto
+- [X] Test sending text commands using Windows API
+- [X] Test command execution and response detection
+- [X] Verify commands affect game state (via text window updates)
 
 #### 5.2 Input Reliability
-- [ ] Test rapid command sequences to Text the Spire
-- [ ] Test command buffering/queuing
-- [ ] Handle prompt window clearing/scrolling
-- [ ] Measure input latency and success rate
-- [ ] Test error handling for invalid commands
+- [ ] Test rapid command sequences to Text the Spire (needs retesting with smart clearing)
+- [ ] Test command buffering/queuing (needs retesting with smart clearing)
+- [X] Handle prompt window clearing/scrolling (smart clearing approach implemented)
+- [ ] Measure input latency and success rate (needs precise measurement)
+- [ ] Test error handling for invalid commands (needs retesting with smart clearing)
 
 ### 6. Integration Testing
 **Priority: Medium**

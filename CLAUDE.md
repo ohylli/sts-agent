@@ -46,12 +46,24 @@ All tools follow this pattern:
 Currently in **Phase 1**: Feasibility Testing
 - **Section 2 Complete**: Window Detection and Enumeration ✅
 - **Section 3 Complete**: Text Window Reading (pywinauto approach) ✅
-- **Key Findings**: Window handles stable during gameplay; pywinauto successfully extracts formatted game state at 25k chars/sec
-- **Main Outputs**: `scripts/reliable_window_finder.py`, `tests/pywinauto_text_extraction.py`, `tests/pywinauto_detailed_text.py`
-- **conclusion**: Since section 3 was a great success we will skip 4. Text Window Reading - Windows API Approach for now at least
-- **Next**: Section 5. Text the Spire Command Input Testing
+- **Section 4 Skipped**: Windows API approach not needed (pywinauto sufficient)
+- **Section 5.1 Complete**: Prompt Window Interaction ✅
+- **Section 5.2 Partial**: Input Reliability (smart clearing done, other tests needed)
+- **Key Findings**: 
+  - Window handles stable during gameplay
+  - pywinauto extracts game state at 25k chars/sec
+  - Command sending works reliably with smart clearing approach
+  - Response detection via Log window confirmed
+- **Core Scripts**: 
+  - `scripts/reliable_window_finder.py` - Window detection with caching
+  - `scripts/find_text_spire_windows.py` - Window enumeration
+  - `scripts/send_command_improved.py` - Command sending with smart clearing
+- **Next**: Section 6. Integration Testing
 
-See `docs/window_documentation.md` and `docs/pywinauto_findings.md` for detailed findings and implementation guidance.
+See documentation:
+- `docs/window_documentation.md` - Window structure and properties
+- `docs/pywinauto_findings.md` - Text extraction approach
+- `docs/command_input_findings.md` - Command sending approach
 
 ## Directory Structure
 

@@ -77,7 +77,7 @@ class TextTheSpireWindowFinder:
             
             if 'Slay the Spire' in title and class_name == 'LWJGL':
                 categorized['main_game_window'].append(window)
-            elif title == 'Prompt' and class_name == 'SunAwtFrame':
+            elif (title in ['Prompt', 'info']) and class_name == 'SunAwtFrame':
                 categorized['prompt_window'].append(window)
             elif 'ModTheSpire' in title:
                 categorized['mod_launcher'].append(window)

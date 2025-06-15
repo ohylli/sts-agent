@@ -66,8 +66,8 @@ def find_text_spire_windows() -> Dict[str, List[Dict]]:
         if 'Slay the Spire' in title and class_name == 'LWJGL':
             categorized['main_game_window'].append(window)
         
-        # Prompt window for commands
-        elif title == 'Prompt' and class_name == 'SunAwtFrame':
+        # Prompt window for commands (can be titled 'Prompt' or 'info')
+        elif (title in ['Prompt', 'info']) and class_name == 'SunAwtFrame':
             categorized['prompt_window'].append(window)
         
         # Mod launcher
