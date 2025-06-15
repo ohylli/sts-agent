@@ -1,5 +1,8 @@
 # Text the Spire Prompt Window Rename - Investigation Results
 
+
+**NOTE**: This is not fully up to date. Ask about this before using this information.
+
 ## Issue Summary
 The Text the Spire mod's prompt window, previously titled "Prompt", has been renamed to "info" in the current version. This caused our window detection scripts to fail in finding the command input window.
 

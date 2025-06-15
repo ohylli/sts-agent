@@ -58,7 +58,7 @@ Currently in **Phase 1**: Feasibility Testing
   - `scripts/reliable_window_finder.py` - Window detection with caching
   - `scripts/find_text_spire_windows.py` - Window enumeration
   - `scripts/send_command_improved.py` - Command sending with smart clearing
-- **Next**: Section 6. Integration Testing
+- **Next**: Finish section 5.2 and then section 6. Integration Testing
 
 See documentation:
 - `docs/window_documentation.md` - Window structure and properties
