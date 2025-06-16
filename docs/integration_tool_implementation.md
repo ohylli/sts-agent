@@ -14,7 +14,6 @@ A Python CLI tool that enables Claude Code to interact with Slay the Spire via t
 5. List all available Text the Spire windows
 6. Capture multiple window states simultaneously
 7. Configure response timeouts
-8. Force cache refresh for window handles
 
 ## Implementation Requirements
 
@@ -25,18 +24,13 @@ A Python CLI tool that enables Claude Code to interact with Slay the Spire via t
 
 ### Key Classes and Methods
 
-#### 1. Window Finder with Caching
+#### 1. Window Finder
 ```python
 class TextTheSpireWindowFinder:
-    def __init__(self, cache_duration=30):
-        self.cache = {}
-        self.cache_time = {}
-        self.cache_duration = cache_duration
-    
-    def get_window(self, title):
-        # Check cache validity (30 seconds)
-        # Return cached handle or re-enumerate
+    def find_window(self, title):
+        # Fresh enumeration on each call
         # Handle both "Prompt" and "info" titles for prompt window
+        # Return None if not found
 ```
 
 #### 2. Command Sender with Smart Clearing
@@ -111,9 +105,6 @@ python sts_tool.py --list-windows
 # Read multiple windows
 python sts_tool.py --read-windows "Map,Hand,Player"
 
-# Force cache refresh
-python sts_tool.py --refresh-cache --execute "choose 1"
-
 # Custom timeout
 python sts_tool.py --execute "wait" --timeout 10
 ```
@@ -121,8 +112,8 @@ python sts_tool.py --execute "wait" --timeout 10
 ## Critical Implementation Details
 
 ### Window Handle Management
-- **Handles are stable during gameplay but invalidated on game restart**
-- Cache handles for 30 seconds during active sessions
+- **Fresh enumeration on each CLI invocation**
+- Window enumeration takes only ~0.0001s (negligible overhead)
 - Always handle window enumeration failures gracefully
 - Prompt window may appear as "Prompt" or "info"
 
@@ -148,15 +139,13 @@ python sts_tool.py --execute "wait" --timeout 10
 ### Error Handling
 - Window not found: Return None/empty, let caller decide
 - Connection failures: Wrap in try/except, return status dict
-- Invalid handles: Trigger re-enumeration
 - Timeouts: Default 5 seconds, configurable per command
 
 ## Performance Expectations
 
 | Operation | Typical Time | Notes |
 |-----------|-------------|-------|
-| Window enumeration | 0.0001s | Fresh scan |
-| Cached window access | <0.00001s | 100x+ faster |
+| Window enumeration | 0.0001s | Per CLI invocation |
 | Command input | 0.249s | Including verification |
 | Response detection | 0.002s | After command processing |
 | Text extraction | 0.0018s | Per window |
