@@ -15,6 +15,33 @@ A Python CLI tool that enables Claude Code to interact with Slay the Spire via t
 6. Capture multiple window states simultaneously
 7. Configure response timeouts
 
+## Text the Spire Window Structure
+
+### Game State Windows
+**Class Name**: `SWT_Window0`  
+**Purpose**: Display real-time game state information  
+
+| Window Title | Purpose |
+|-------------|---------|
+| Player | Player stats, health, energy, block |
+| Monster | Enemy information, intent, health |
+| Hand | Cards currently in hand |
+| Deck | Cards in draw pile |
+| Discard | Cards in discard pile |
+| Orbs | Orb information (for Defect) |
+| Relic | Active relics |
+| Output | Game output messages |
+| Log | Detailed game log (used for response verification) |
+
+### Command Input Window
+**Window Titles**: `Prompt` or `info` (varies)  
+**Class Name**: `SunAwtFrame`  
+**Purpose**: Text input for sending commands to the game  
+
+### Windows to Ignore
+- Main game window ("Modded Slay the Spire", class `LWJGL`)
+- Mod launcher windows
+
 ## Implementation Requirements
 
 ### Dependencies
@@ -22,15 +49,75 @@ A Python CLI tool that enables Claude Code to interact with Slay the Spire via t
 - **pywin32** (for Windows-specific operations)
 - **Python 3.x** running on Windows or WSL with Windows Python
 
+### Window Enumeration
+
+```python
+def enumerate_text_the_spire_windows():
+    """Find all Text the Spire windows."""
+    from pywinauto import Desktop
+    
+    windows = []
+    desktop = Desktop(backend="uia")
+    
+    # Find all windows
+    all_windows = desktop.windows()
+    
+    for window in all_windows:
+        try:
+            # Get window properties
+            title = window.window_text()
+            class_name = window.class_name()
+            
+            # Filter for Text the Spire windows
+            if class_name == "SWT_Window0":  # Game state windows
+                windows.append({
+                    'title': title,
+                    'type': 'game_state',
+                    'window': window
+                })
+            elif class_name == "SunAwtFrame" and title in ["Prompt", "info"]:
+                windows.append({
+                    'title': 'Prompt',  # Normalize title
+                    'type': 'command',
+                    'window': window
+                })
+        except Exception:
+            continue  # Skip inaccessible windows
+    
+    return windows
+```
+
 ### Key Classes and Methods
 
 #### 1. Window Finder
 ```python
 class TextTheSpireWindowFinder:
     def find_window(self, title):
-        # Fresh enumeration on each call
-        # Handle both "Prompt" and "info" titles for prompt window
-        # Return None if not found
+        """Find a specific Text the Spire window by title."""
+        from pywinauto import Desktop
+        
+        desktop = Desktop(backend="uia")
+        
+        # Special handling for prompt window
+        if title.lower() == "prompt":
+            # Try both possible titles
+            for prompt_title in ["Prompt", "info"]:
+                try:
+                    window = desktop.window(title=prompt_title, class_name="SunAwtFrame")
+                    if window.exists():
+                        return window
+                except:
+                    continue
+        else:
+            # Game state windows
+            try:
+                window = desktop.window(title=title, class_name="SWT_Window0")
+                if window.exists():
+                    return window
+            except:
+                pass
+        
+        return None  # Window not found
 ```
 
 #### 2. Command Sender with Smart Clearing
@@ -101,6 +188,7 @@ python sts_tool.py --execute "end" --read-window "Event" --verify
 
 # List all windows
 python sts_tool.py --list-windows
+# Output: Player, Monster, Hand, Deck, Discard, Orbs, Relic, Output, Log, Prompt
 
 # Read multiple windows
 python sts_tool.py --read-windows "Map,Hand,Player"
@@ -116,6 +204,8 @@ python sts_tool.py --execute "wait" --timeout 10
 - Window enumeration takes only ~0.0001s (negligible overhead)
 - Always handle window enumeration failures gracefully
 - Prompt window may appear as "Prompt" or "info"
+- Filter windows by class name: `SWT_Window0` (game state) or `SunAwtFrame` (prompt)
+- Ignore the main game window (`LWJGL` class) - never interact with it
 
 ### Command Execution
 - **Smart clearing eliminates Windows error sounds and input issues**
