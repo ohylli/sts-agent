@@ -61,16 +61,28 @@ Currently in **Phase 1**: Feasibility Testing
   - `scripts/find_text_spire_windows.py` - Window enumeration
   - `scripts/send_command_improved.py` - Command sending with smart clearing
   - `scripts/section_5_2_reliability_tests.py` - Comprehensive reliability testing
-- **Next**: Section 6 Integration Testing
+- **Section 6.1 Complete**: CLI Tool Development ✅
+  - Implemented full CLI interface with argparse (`src/sts_tool.py`)
+  - Created modular structure with stub implementations
+  - All commands working: list-windows, execute, read-window, etc.
+  - Ready for real implementation
+- **Current Task**: Section 6.2 - Replace stubs with real implementations
+  - Next: Implement window_finder.py module
 
 See documentation:
 - `docs/window_documentation.md` - Window structure and properties
 - `docs/pywinauto_findings.md` - Text extraction approach
 - `docs/command_input_findings.md` - Command sending approach
+- `docs/cli_tool_development.md` - CLI tool design and implementation status
+- `docs/cli_tool_api.md` - CLI tool usage and API reference
 
 ## Directory Structure
 
-- `src/` - Core toolkit modules (window detection, text extraction, command sending, parsers)
+- `src/` - Core CLI tool and modules
+  - `sts_tool.py` - Main CLI entry point
+  - `core/` - Core functionality (stubs.py, future: window_finder.py, command_executor.py, text_extractor.py)
+  - `utils/` - Constants and utilities
+  - `sts_types.py` - TypedDict definitions
 - `tests/` - Phase 1 testing scripts (pywinauto vs win32api, reliability tests, integration tests)
 - `scripts/` - Standalone utilities (window enumeration, manual testing, performance tools)
 - `docs/` - Technical findings, mod documentation, API design notes, metrics
