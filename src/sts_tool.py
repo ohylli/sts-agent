@@ -13,10 +13,14 @@ def handle_list_windows(args):
     """Handle --list-windows command."""
     windows = stubs.list_windows()
     
-    print("\nAvailable Text the Spire Windows:")
-    print("-" * 40)
-    for window in windows:
-        print(f"{window['title']:<15} Type: {window['type']:<12} Class: {window['class_name']}")
+    if args.debug:
+        print("\nAvailable Text the Spire Windows:")
+        print("-" * 40)
+        for window in windows:
+            print(f"{window['title']:<15} Type: {window['type']:<12} Class: {window['class_name']}")
+    else:
+        for window in windows:
+            print(window['title'])
     
     return 0
 
@@ -161,6 +165,8 @@ Examples:
                         help=f'Command timeout in seconds (default: {DEFAULT_COMMAND_TIMEOUT})')
     parser.add_argument('--json', action='store_true',
                         help='Output results as JSON')
+    parser.add_argument('--debug', action='store_true',
+                        help='Show detailed debug information')
     
     args = parser.parse_args()
     
