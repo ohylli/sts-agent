@@ -5,6 +5,7 @@ from typing import List, Optional
 from sts_types import WindowInfo, CommandResult, ExecuteAndReadResult, WindowContent, MultiWindowContent
 from utils.constants import GAME_STATE_WINDOWS, AVERAGE_INPUT_LATENCY, AVERAGE_RESPONSE_TIME
 from .window_finder import list_windows  # Use real implementation
+from .text_extractor import read_window as _read_window, read_multiple_windows as _read_multiple_windows
 
 def execute_command(command: str, verify: bool = False, timeout: float = 5.0) -> CommandResult:
     """Stub: Execute a command in the Prompt window."""
@@ -39,44 +40,12 @@ def execute_command_sequence(commands: List[str], verify: bool = False, timeout:
     return results
 
 def read_window(window_title: str) -> WindowContent:
-    """Stub: Read content from a specific window."""
-    print(f"[STUB] Would read content from '{window_title}' window")
-    
-    # Mock some example content
-    mock_content = {
-        "Player": "HP: 70/70\nEnergy: 3/3\nBlock: 0\nGold: 99",
-        "Hand": "1. Strike - Deal 6 damage. Cost: 1\n2. Defend - Gain 5 Block. Cost: 1",
-        "Monster": "Cultist - HP: 48/48\nIntent: Attack for 6 damage",
-        "Map": "Floor 1 - Enemy\nFloor 2 - Unknown\nFloor 3 - Elite",
-        "Log": "Turn 1\nDrew 5 cards\nPlayer's turn begins"
-    }
-    
-    content = mock_content.get(window_title, f"[Mock content from {window_title} window]")
-    print(f"[STUB] Window contains {len(content)} characters")
-    
-    return {
-        "window_title": window_title,
-        "content": content,
-        "error": None
-    }
+    """Read content from a specific window using real text extractor."""
+    return _read_window(window_title)
 
 def read_multiple_windows(window_titles: List[str]) -> MultiWindowContent:
-    """Stub: Read content from multiple windows."""
-    print(f"[STUB] Would read content from {len(window_titles)} windows: {', '.join(window_titles)}")
-    
-    start_time = time.time()
-    windows = []
-    
-    for title in window_titles:
-        window_content = read_window(title)
-        windows.append(window_content)
-    
-    total_time = time.time() - start_time
-    
-    return {
-        "windows": windows,
-        "total_time": total_time
-    }
+    """Read content from multiple windows using real text extractor."""
+    return _read_multiple_windows(window_titles)
 
 def execute_and_read(command: str, window_title: str, verify: bool = True, timeout: float = 5.0) -> ExecuteAndReadResult:
     """Stub: Execute a command and then read a window."""
