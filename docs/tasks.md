@@ -110,7 +110,7 @@ Phase 1 focuses on proving the basic technical feasibility of interacting with S
 - [ ] Replace stubs with real implementations (IN PROGRESS)
 
 #### 6.2 Core Module Implementation
-- [ ] Implement window_finder.py (port from reliable_window_finder.py)
+- [X] Implement window_finder.py (port from reliable_window_finder.py)
 - [ ] Implement text_extractor.py (use pywinauto approach)
 - [ ] Implement command_executor.py (smart clearing + verification)
 - [ ] Test each module with live game

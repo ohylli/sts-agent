@@ -4,26 +4,7 @@ import time
 from typing import List, Optional
 from sts_types import WindowInfo, CommandResult, ExecuteAndReadResult, WindowContent, MultiWindowContent
 from utils.constants import GAME_STATE_WINDOWS, AVERAGE_INPUT_LATENCY, AVERAGE_RESPONSE_TIME
-
-def list_windows() -> List[WindowInfo]:
-    """Stub: List all available Text the Spire windows."""
-    print("[STUB] Would enumerate Text the Spire windows")
-    print("[STUB] Found windows: Player, Monster, Hand, Deck, Discard, Orbs, Relic, Output, Log, Map, Prompt")
-    
-    # Return mock window list
-    windows = []
-    for window_name in GAME_STATE_WINDOWS:
-        windows.append({
-            "title": window_name,
-            "type": "game_state",
-            "class_name": "SWT_Window0"
-        })
-    windows.append({
-        "title": "Prompt",
-        "type": "command", 
-        "class_name": "SunAwtFrame"
-    })
-    return windows
+from .window_finder import list_windows  # Use real implementation
 
 def execute_command(command: str, verify: bool = False, timeout: float = 5.0) -> CommandResult:
     """Stub: Execute a command in the Prompt window."""
