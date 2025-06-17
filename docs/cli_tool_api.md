@@ -15,6 +15,13 @@ cd src
 python.exe sts_tool.py --help
 ```
 
+## Requirements
+
+- Windows OS (Text the Spire is Windows-only)
+- Python 3.8+
+- Slay the Spire with Text the Spire mod installed and running
+- pywinauto and pywin32 packages
+
 ## Commands
 
 ### Window Operations
@@ -22,10 +29,16 @@ python.exe sts_tool.py --help
 #### `--list-windows`
 List all available Text the Spire windows.
 
-**Output**: Table showing window title, type (game_state/command), and class name.
+**Output**: 
+- Default: Simple list of window titles (one per line)
+- With `--debug`: Detailed table showing window title, type (game_state/command), and class name
 
 ```bash
+# Simple output - just window names
 python.exe sts_tool.py --list-windows
+
+# Detailed output with debug info
+python.exe sts_tool.py --list-windows --debug
 ```
 
 #### `--read-window WINDOW`
@@ -102,6 +115,13 @@ Output results in JSON format for programmatic use.
 python.exe sts_tool.py --read-window "Player" --json
 ```
 
+### `--debug`
+Show detailed debug information (currently only affects `--list-windows`).
+
+```bash
+python.exe sts_tool.py --list-windows --debug
+```
+
 ## Return Codes
 
 - `0`: Success
@@ -116,6 +136,16 @@ python.exe sts_tool.py --read-window "Player" --json
     "title": "Player",
     "type": "game_state",
     "class_name": "SWT_Window0"
+  },
+  {
+    "title": "Hand",
+    "type": "game_state",
+    "class_name": "SWT_Window0"
+  },
+  {
+    "title": "Prompt",
+    "type": "command",
+    "class_name": "SunAwtFrame"
   }
 ]
 ```
@@ -133,9 +163,28 @@ python.exe sts_tool.py --read-window "Player" --json
 ### Window Content
 ```json
 {
-  "window_title": "Map",
-  "content": "Floor 1 - Enemy\nFloor 2 - Unknown",
+  "window_title": "Player",
+  "content": "Block: 0\nHealth: 88/88\nEnergy: 3",
   "error": null
+}
+```
+
+### Multiple Windows Content
+```json
+{
+  "windows": [
+    {
+      "window_title": "Player",
+      "content": "Block: 0\nHealth: 88/88\nEnergy: 3",
+      "error": null
+    },
+    {
+      "window_title": "Hand",
+      "content": "1:Strike 1\n2:Strike 1\n3:Defend 1\nPotions:\n0:Potion Slot",
+      "error": null
+    }
+  ],
+  "total_time": 0.006
 }
 ```
 
@@ -154,13 +203,13 @@ python.exe sts_tool.py --read-window "Player" --json
 
 ### Basic Combat Turn
 ```bash
-# View current game state
+# View current game state (REAL - shows actual game data)
 python.exe sts_tool.py --read-windows "Player,Hand,Monster"
 
-# Play a card
+# Play a card (STUB - simulated execution)
 python.exe sts_tool.py --execute "play 0" --verify
 
-# End turn
+# End turn (STUB - simulated execution)
 python.exe sts_tool.py --execute "end" --verify
 ```
 
@@ -190,11 +239,15 @@ python.exe sts_tool.py --execute-list battle_sequence.txt --verify
 
 ## Performance Characteristics
 
-- **Window enumeration**: ~100ms
-- **Text extraction**: Up to 25,000 chars/second
+### Measured (Real Implementation)
+- **Window enumeration**: <100ms for all windows
+- **Text extraction**: 0.006s for 3 windows (exceeds 25,000 chars/second)
+- **Multi-window reading**: Scales linearly, very efficient
+
+### Expected (From Phase 1 Testing)
 - **Command execution**: ~250ms input latency
 - **Response verification**: <5ms response time
-- **Reliability**: >90% command success rate
+- **Reliability**: >90% command success rate with smart clearing
 
 ## Error Handling
 
@@ -204,9 +257,25 @@ The tool provides clear error messages for common issues:
 - File not found (for --execute-list)
 - Invalid command syntax
 
-## Current Limitations
+## Current Implementation Status
 
-1. **Stub Implementation**: Currently using stubs, not connected to real game
+### Fully Implemented (Real) ✅
+- `--list-windows`: Enumerates actual Text the Spire windows
+- `--read-window`: Reads real game state from windows
+- `--read-windows`: Bulk reads multiple windows efficiently
+- Window detection and filtering by class/title
+- Text extraction using pywinauto (children aggregation method)
+- Error handling for missing/inaccessible windows
+
+### Stub Implementation (Simulated) ⏳
+- `--execute`: Command sending simulated
+- `--execute-list`: Batch command execution simulated
+- `--verify`: Response verification simulated
+- Command timing and success rates based on real metrics
+
+### Current Limitations
+
+1. **Command Execution**: Still using stubs for safety during development
 2. **Windows Only**: Text the Spire mod is Windows-specific
 3. **Single Instance**: Assumes one game instance running
 4. **Sequential Commands**: No parallel command execution

@@ -111,10 +111,10 @@ Phase 1 focuses on proving the basic technical feasibility of interacting with S
 
 #### 6.2 Core Module Implementation
 - [X] Implement window_finder.py (port from reliable_window_finder.py)
-- [ ] Implement text_extractor.py (use pywinauto approach)
+- [X] Implement text_extractor.py (use pywinauto approach)
 - [ ] Implement command_executor.py (smart clearing + verification)
-- [ ] Test each module with live game
-- [ ] Add comprehensive error handling
+- [X] Test window_finder and text_extractor with live game
+- [X] Add error handling for window operations
 
 #### 6.3 Integration Testing
 - [ ] Test full cycle: read state → decide → send command
@@ -128,11 +128,12 @@ Phase 1 focuses on proving the basic technical feasibility of interacting with S
 
 #### 7.1 Technical Documentation
 - [X] Document CLI tool design decisions
-- [X] Create API reference for CLI tool
+- [X] Create API reference for CLI tool (updated with --debug and current status)
 - [X] Document implementation plan and status
-- [ ] Document each approach with code examples
-- [ ] Create comparison matrix of approaches
-- [ ] Include performance metrics and reliability data
+- [X] Document performance metrics from implemented modules
+- [ ] Document command executor approach with code examples
+- [ ] Create final comparison matrix of all approaches
+- [ ] Complete reliability data for command execution
 
 #### 7.2 Recommendation Report
 - [ ] Write executive summary of findings

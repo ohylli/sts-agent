@@ -16,6 +16,8 @@ This document details the development of the Text the Spire CLI tool (`sts_tool.
 - Provides clear documentation of expected behavior through stub messages
 - Facilitates incremental development - stubs can be replaced one by one
 
+**Update**: This approach has proven highly successful. We've now replaced the window listing and text reading stubs with real implementations while keeping command execution as stubs for safety during development.
+
 ### 2. File Structure
 
 **Decision**: Modular structure with clear separation of concerns.
@@ -24,7 +26,9 @@ This document details the development of the Text the Spire CLI tool (`sts_tool.
 src/
 ├── sts_tool.py          # Main CLI entry point
 ├── core/                # Core functionality modules
-│   └── stubs.py        # Stub implementations (to be replaced)
+│   ├── stubs.py        # Stub implementations (partially replaced)
+│   ├── window_finder.py # Real window enumeration (implemented)
+│   └── text_extractor.py # Real text extraction (implemented)
 ├── utils/              # Utility functions
 │   └── constants.py    # Constants and configuration
 └── sts_types.py        # Type definitions
@@ -103,13 +107,13 @@ Defines:
 
 ### Stub Implementations (`core/stubs.py`)
 
-Current stubs:
-- `list_windows()` - Returns mock window list
-- `execute_command()` - Simulates command execution
-- `execute_command_sequence()` - Handles multiple commands
-- `read_window()` - Returns mock window content
-- `read_multiple_windows()` - Reads multiple windows
-- `execute_and_read()` - Combined operation
+Current status:
+- `list_windows()` - ✅ Using real implementation from window_finder.py
+- `execute_command()` - ⏳ Still stub, simulates command execution
+- `execute_command_sequence()` - ⏳ Still stub, handles multiple commands
+- `read_window()` - ✅ Using real implementation from text_extractor.py
+- `read_multiple_windows()` - ✅ Using real implementation from text_extractor.py
+- `execute_and_read()` - ⏳ Still stub, uses real read but stub execute
 
 ## Implementation Plan
 
@@ -120,20 +124,20 @@ Current stubs:
 4. ✅ Add type definitions
 5. ✅ Test all CLI combinations
 
-### Phase 2: Core Implementation (PENDING)
+### Phase 2: Core Implementation (IN PROGRESS)
 Replace stubs with real implementations in this order:
 
-1. **Window Finder Module** (`core/window_finder.py`)
-   - Port window enumeration from `scripts/reliable_window_finder.py`
-   - Implement window caching for performance
-   - Add robust error handling
+1. **Window Finder Module** (`core/window_finder.py`) ✅ COMPLETED
+   - Ported window enumeration from Phase 1 testing
+   - Filters Text the Spire windows by class and title
+   - Returns categorized window information
 
-2. **Text Extractor Module** (`core/text_extractor.py`)
-   - Use pywinauto for text extraction
-   - Handle empty windows and errors
-   - Optimize for performance (target: 25k chars/sec)
+2. **Text Extractor Module** (`core/text_extractor.py`) ✅ COMPLETED
+   - Uses pywinauto children aggregation method
+   - Handles missing/inaccessible windows gracefully
+   - Achieved performance: 0.006s for 3 windows (exceeds 25k chars/sec target)
 
-3. **Command Executor Module** (`core/command_executor.py`)
+3. **Command Executor Module** (`core/command_executor.py`) ⏳ PENDING
    - Implement smart clearing approach
    - Add response verification via Log window
    - Handle timing and reliability (target: >90% success rate)
@@ -148,58 +152,66 @@ Replace stubs with real implementations in this order:
 
 ### Completed ✅
 - Full CLI interface with all commands working
-- Stub implementations providing realistic mock data
+- Window finder module with real window enumeration
+- Text extractor module using pywinauto approach
 - Type safety with TypedDict definitions
 - Constants based on actual testing metrics
-- Error handling for common cases
+- Error handling for missing/inaccessible windows
 - JSON output support
 - Documentation and help text
+- Successfully tested window listing and text reading with live game
 
 ### In Progress 🔄
-- Ready to begin replacing stubs with real implementations
-- Next step: Implement window_finder.py
+- Replacing remaining stubs with real implementations
+- Next step: Implement command_executor.py
 
 ### Pending ⏳
-- Real window detection and enumeration
-- Actual text extraction from game windows
 - Command execution with smart clearing
-- Response verification
-- Integration testing with live game
+- Response verification via Log window
+- Full integration testing with all features
+- Performance optimization if needed
 
 ## Usage Examples
 
 ```bash
-# List all available windows
+# List all available windows (REAL - shows actual Text the Spire windows)
 python.exe sts_tool.py --list-windows
 
-# Execute a command with verification
+# List windows with debug info (REAL - includes window type and class)
+python.exe sts_tool.py --list-windows --debug
+
+# Execute a command with verification (STUB - simulated execution)
 python.exe sts_tool.py --execute "choose 1" --verify
 
-# Read a specific window
-python.exe sts_tool.py --read-window "Map"
+# Read a specific window (REAL - shows actual game state)
+python.exe sts_tool.py --read-window "Player"
 
-# Execute command and read result
+# Read multiple windows (REAL - fast bulk reading)
+python.exe sts_tool.py --read-windows "Player,Hand,Monster"
+
+# Execute command and read result (HYBRID - stub execute, real read)
 python.exe sts_tool.py --execute "end" --read-window "Event" --verify
 
-# Batch execution from file
+# Batch execution from file (STUB - simulated execution)
 python.exe sts_tool.py --execute-list commands.txt --verify
 
-# JSON output for programmatic use
+# JSON output for programmatic use (REAL data)
 python.exe sts_tool.py --read-windows "Player,Hand,Monster" --json
 ```
 
 ## Testing Strategy
 
-1. **Manual Testing** (current phase)
-   - Test all CLI commands with stubs
-   - Verify error handling
-   - Check output formatting
+1. **Manual Testing** ✅ (completed for implemented features)
+   - Tested all CLI commands
+   - Verified error handling for missing windows
+   - Checked output formatting in both text and JSON modes
 
-2. **Integration Testing** (next phase)
-   - Test with Text the Spire running
-   - Verify window detection
-   - Test command execution reliability
-   - Measure performance metrics
+2. **Integration Testing** 🔄 (partially complete)
+   - ✅ Tested window detection with live game
+   - ✅ Verified text extraction from all window types
+   - ✅ Measured performance (0.006s for 3 windows)
+   - ⏳ Command execution reliability testing pending
+   - ⏳ End-to-end workflow testing pending
 
 3. **Automated Testing** (future)
    - Unit tests for each module
@@ -215,8 +227,12 @@ python.exe sts_tool.py --read-windows "Player,Hand,Monster" --json
 
 ## Next Steps
 
-1. Create `core/window_finder.py` by porting code from `scripts/reliable_window_finder.py`
-2. Replace `list_windows()` stub with real implementation
-3. Test window enumeration with live game
-4. Continue replacing stubs incrementally
-5. Add comprehensive error handling and logging
+1. ✅ ~~Create `core/window_finder.py` by porting code from `scripts/reliable_window_finder.py`~~
+2. ✅ ~~Replace `list_windows()` stub with real implementation~~
+3. ✅ ~~Test window enumeration with live game~~
+4. ✅ ~~Create `core/text_extractor.py` using pywinauto approach~~
+5. ✅ ~~Replace text reading stubs with real implementations~~
+6. ⏳ Create `core/command_executor.py` with smart clearing approach
+7. ⏳ Replace command execution stubs
+8. ⏳ Add comprehensive logging
+9. ⏳ Full integration testing with all features

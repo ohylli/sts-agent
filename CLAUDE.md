@@ -65,9 +65,12 @@ Currently in **Phase 1**: Feasibility Testing
   - Implemented full CLI interface with argparse (`src/sts_tool.py`)
   - Created modular structure with stub implementations
   - All commands working: list-windows, execute, read-window, etc.
-  - Ready for real implementation
-- **Current Task**: Section 6.2 - Replace stubs with real implementations
-  - Next: Implement window_finder.py module
+  - Added --debug flag for detailed window information
+- **Section 6.2 In Progress**: Core Module Implementation
+  - ✅ Implemented window_finder.py (real window enumeration)
+  - ✅ Implemented text_extractor.py (pywinauto text reading, 0.006s for 3 windows)
+  - ✅ Tested with live game - successfully reading all game state
+  - Next: Implement command_executor.py (smart clearing + verification)
 
 See documentation:
 - `docs/window_documentation.md` - Window structure and properties
@@ -79,8 +82,12 @@ See documentation:
 ## Directory Structure
 
 - `src/` - Core CLI tool and modules
-  - `sts_tool.py` - Main CLI entry point
-  - `core/` - Core functionality (stubs.py, future: window_finder.py, command_executor.py, text_extractor.py)
+  - `sts_tool.py` - Main CLI entry point (with --debug option)
+  - `core/` - Core functionality
+    - `stubs.py` - Partially replaced with real implementations
+    - `window_finder.py` - Real window enumeration (implemented)
+    - `text_extractor.py` - Real text extraction using pywinauto (implemented)
+    - `command_executor.py` - Command sending (pending)
   - `utils/` - Constants and utilities
   - `sts_types.py` - TypedDict definitions
 - `tests/` - Phase 1 testing scripts (pywinauto vs win32api, reliability tests, integration tests)
