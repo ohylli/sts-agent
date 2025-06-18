@@ -71,38 +71,41 @@ def handle_execute_command(args):
 
 
 def handle_read_window(args):
-    """Handle --read-window command."""
-    window_content = stubs.read_window(args.read_window)
+    """Handle --read-window command (single or comma-separated multiple windows)."""
+    # Parse window titles - split by comma and strip whitespace
+    window_titles = [title.strip() for title in args.read_window.split(',') if title.strip()]
     
-    if args.json:
-        print(json.dumps(window_content, indent=2))
-    else:
-        print(f"\n=== {window_content['window_title']} Window ===")
-        if window_content['error']:
-            print(f"Error: {window_content['error']}")
+    if len(window_titles) == 1:
+        # Single window
+        window_content = stubs.read_window(window_titles[0])
+        
+        if args.json:
+            print(json.dumps(window_content, indent=2))
         else:
-            print(window_content['content'])
-    
-    return 0 if not window_content['error'] else 1
-
-def handle_read_windows(args):
-    """Handle --read-windows command."""
-    window_titles = [title.strip() for title in args.read_windows.split(',')]
-    result = stubs.read_multiple_windows(window_titles)
-    
-    if args.json:
-        print(json.dumps(result, indent=2))
-    else:
-        print(f"\nReading {len(window_titles)} windows (took {result['total_time']:.3f}s):")
-        print("=" * 50)
-        for window in result['windows']:
-            print(f"\n=== {window['window_title']} ===")
-            if window['error']:
-                print(f"Error: {window['error']}")
+            print(f"\n=== {window_content['window_title']} Window ===")
+            if window_content['error']:
+                print(f"Error: {window_content['error']}")
             else:
-                print(window['content'])
-    
-    return 0
+                print(window_content['content'])
+        
+        return 0 if not window_content['error'] else 1
+    else:
+        # Multiple windows
+        result = stubs.read_multiple_windows(window_titles)
+        
+        if args.json:
+            print(json.dumps(result, indent=2))
+        else:
+            print(f"\nReading {len(window_titles)} windows (took {result['total_time']:.3f}s):")
+            print("=" * 50)
+            for window in result['windows']:
+                print(f"\n=== {window['window_title']} ===")
+                if window['error']:
+                    print(f"Error: {window['error']}")
+                else:
+                    print(window['content'])
+        
+        return 0
 
 def handle_execute_and_read(args):
     """Handle combined --execute and --read-window."""
@@ -141,7 +144,7 @@ Examples:
   %(prog)s --execute "choose 1,play 0,end" --verify
   %(prog)s --read-window "Map"
   %(prog)s --execute "end" --read-window "Event" --verify
-  %(prog)s --read-windows "Map,Hand,Player"
+  %(prog)s --read-window "Map,Hand,Player"
         """
     )
     
@@ -150,10 +153,8 @@ Examples:
                         help='List all available Text the Spire windows')
     parser.add_argument('--execute', metavar='COMMAND',
                         help='Execute one or more commands (comma-separated for multiple)')
-    parser.add_argument('--read-window', metavar='WINDOW',
-                        help='Read content from a specific window')
-    parser.add_argument('--read-windows', metavar='WINDOWS',
-                        help='Read content from multiple windows (comma-separated)')
+    parser.add_argument('--read-window', metavar='WINDOW[,WINDOW2,...]',
+                        help='Read content from one or more windows (comma-separated for multiple)')
     
     # Options
     parser.add_argument('--verify', action='store_true',
@@ -168,8 +169,7 @@ Examples:
     args = parser.parse_args()
     
     # Validate arguments
-    if not any([args.list_windows, args.execute, 
-                args.read_window, args.read_windows]):
+    if not any([args.list_windows, args.execute, args.read_window]):
         parser.error('No action specified. Use --help for usage information.')
     
     # Handle commands
@@ -180,8 +180,6 @@ Examples:
             return handle_execute_and_read(args)
         elif args.execute:
             return handle_execute_command(args)
-        elif args.read_windows:
-            return handle_read_windows(args)
         elif args.read_window:
             return handle_read_window(args)
     except KeyboardInterrupt:

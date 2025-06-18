@@ -41,24 +41,19 @@ python.exe sts_tool.py --list-windows
 python.exe sts_tool.py --list-windows --debug
 ```
 
-#### `--read-window WINDOW`
-Read content from a specific window.
+#### `--read-window WINDOW[,WINDOW2,...]`
+Read content from one or more windows.
 
 **Parameters**:
-- `WINDOW`: Window title (e.g., "Player", "Map", "Hand")
+- `WINDOW`: Single window title (e.g., "Player", "Map", "Hand")
+- `WINDOW[,WINDOW2,...]`: Multiple window titles separated by commas
 
 ```bash
+# Single window
 python.exe sts_tool.py --read-window "Map"
-```
 
-#### `--read-windows WINDOWS`
-Read content from multiple windows in one operation.
-
-**Parameters**:
-- `WINDOWS`: Comma-separated list of window titles
-
-```bash
-python.exe sts_tool.py --read-windows "Player,Hand,Monster"
+# Multiple windows
+python.exe sts_tool.py --read-window "Player,Hand,Monster"
 ```
 
 ### Command Execution
@@ -80,15 +75,18 @@ python.exe sts_tool.py --execute "choose 1,play 0,end"
 
 ### Combined Operations
 
-#### `--execute COMMAND[,COMMAND2,...] --read-window WINDOW`
-Execute one or more commands and immediately read a window.
+#### `--execute COMMAND[,COMMAND2,...] --read-window WINDOW[,WINDOW2,...]`
+Execute one or more commands and immediately read one or more windows.
 
 ```bash
-# Single command with read
+# Single command with single window read
 python.exe sts_tool.py --execute "end" --read-window "Event"
 
-# Multiple commands with read
+# Multiple commands with single window read
 python.exe sts_tool.py --execute "play 0,play 1,end" --read-window "Monster"
+
+# Single command with multiple window read
+python.exe sts_tool.py --execute "end" --read-window "Player,Monster"
 ```
 
 ## Options
@@ -253,8 +251,7 @@ The tool provides clear error messages for common issues:
 
 ### Fully Implemented (Real) ✅
 - `--list-windows`: Enumerates actual Text the Spire windows
-- `--read-window`: Reads real game state from windows
-- `--read-windows`: Bulk reads multiple windows efficiently
+- `--read-window`: Reads real game state from single or multiple windows (comma-separated)
 - Window detection and filtering by class/title
 - Text extraction using pywinauto (children aggregation method)
 - Error handling for missing/inaccessible windows
