@@ -109,8 +109,8 @@ Defines:
 
 Current status:
 - `list_windows()` - ✅ Using real implementation from window_finder.py
-- `execute_command()` - ⏳ Still stub, simulates command execution
-- `execute_command_sequence()` - ⏳ Still stub, handles multiple commands
+- `execute_command()` - ⏳ Still stub, simulates single command execution
+- `execute_command_sequence()` - ⏳ Still stub, handles multiple commands (used for comma-separated commands)
 - `read_window()` - ✅ Using real implementation from text_extractor.py
 - `read_multiple_windows()` - ✅ Using real implementation from text_extractor.py
 - `execute_and_read()` - ⏳ Still stub, uses real read but stub execute
@@ -180,8 +180,11 @@ python.exe sts_tool.py --list-windows
 # List windows with debug info (REAL - includes window type and class)
 python.exe sts_tool.py --list-windows --debug
 
-# Execute a command with verification (STUB - simulated execution)
+# Execute a single command with verification (STUB - simulated execution)
 python.exe sts_tool.py --execute "choose 1" --verify
+
+# Execute multiple commands with verification (STUB - simulated execution)
+python.exe sts_tool.py --execute "choose 1,play 0,end" --verify
 
 # Read a specific window (REAL - shows actual game state)
 python.exe sts_tool.py --read-window "Player"
@@ -191,9 +194,6 @@ python.exe sts_tool.py --read-windows "Player,Hand,Monster"
 
 # Execute command and read result (HYBRID - stub execute, real read)
 python.exe sts_tool.py --execute "end" --read-window "Event" --verify
-
-# Batch execution from file (STUB - simulated execution)
-python.exe sts_tool.py --execute-list commands.txt --verify
 
 # JSON output for programmatic use (REAL data)
 python.exe sts_tool.py --read-windows "Player,Hand,Monster" --json

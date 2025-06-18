@@ -63,33 +63,32 @@ python.exe sts_tool.py --read-windows "Player,Hand,Monster"
 
 ### Command Execution
 
-#### `--execute COMMAND`
-Execute a single command in the game.
+#### `--execute COMMAND[,COMMAND2,...]`
+Execute one or more commands in the game.
 
 **Parameters**:
-- `COMMAND`: Game command (e.g., "choose 1", "play 0", "end")
+- `COMMAND`: Single game command (e.g., "choose 1", "play 0", "end")
+- `COMMAND[,COMMAND2,...]`: Multiple commands separated by commas
 
 ```bash
+# Single command
 python.exe sts_tool.py --execute "choose 1"
-```
 
-#### `--execute-list FILE`
-Execute multiple commands from a file.
-
-**Parameters**:
-- `FILE`: Path to file containing commands (one per line)
-
-```bash
-python.exe sts_tool.py --execute-list commands.txt
+# Multiple commands
+python.exe sts_tool.py --execute "choose 1,play 0,end"
 ```
 
 ### Combined Operations
 
-#### `--execute COMMAND --read-window WINDOW`
-Execute a command and immediately read a window.
+#### `--execute COMMAND[,COMMAND2,...] --read-window WINDOW`
+Execute one or more commands and immediately read a window.
 
 ```bash
+# Single command with read
 python.exe sts_tool.py --execute "end" --read-window "Event"
+
+# Multiple commands with read
+python.exe sts_tool.py --execute "play 0,play 1,end" --read-window "Monster"
 ```
 
 ## Options
@@ -227,14 +226,8 @@ python.exe sts_tool.py --execute "proceed" --verify
 
 ### Batch Processing
 ```bash
-# Create command file
-echo "choose 1" > battle_sequence.txt
-echo "play 0" >> battle_sequence.txt
-echo "play 1" >> battle_sequence.txt
-echo "end" >> battle_sequence.txt
-
-# Execute sequence
-python.exe sts_tool.py --execute-list battle_sequence.txt --verify
+# Execute sequence of commands
+python.exe sts_tool.py --execute "choose 1,play 0,play 1,end" --verify
 ```
 
 ## Performance Characteristics
@@ -254,7 +247,6 @@ python.exe sts_tool.py --execute-list battle_sequence.txt --verify
 The tool provides clear error messages for common issues:
 - Window not found
 - Command execution timeout
-- File not found (for --execute-list)
 - Invalid command syntax
 
 ## Current Implementation Status
@@ -268,8 +260,7 @@ The tool provides clear error messages for common issues:
 - Error handling for missing/inaccessible windows
 
 ### Stub Implementation (Simulated) ⏳
-- `--execute`: Command sending simulated
-- `--execute-list`: Batch command execution simulated
+- `--execute`: Command sending simulated (single and multiple commands)
 - `--verify`: Response verification simulated
 - Command timing and success rates based on real metrics
 

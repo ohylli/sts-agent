@@ -25,52 +25,50 @@ def handle_list_windows(args):
     return 0
 
 def handle_execute_command(args):
-    """Handle --execute command."""
-    result = stubs.execute_command(
-        command=args.execute,
-        verify=args.verify,
-        timeout=args.timeout
-    )
+    """Handle --execute command (single or comma-separated multiple commands)."""
+    # Parse commands - split by comma and strip whitespace
+    commands = [cmd.strip() for cmd in args.execute.split(',') if cmd.strip()]
     
-    if args.json:
-        print(json.dumps(result, indent=2))
-    else:
-        print(f"\nCommand: '{result['command']}'")
-        print(f"Success: {result['success']}")
-        print(f"Response Time: {result['response_time']:.3f}s")
-        if result['error']:
-            print(f"Error: {result['error']}")
-    
-    return 0 if result['success'] else 1
-
-def handle_execute_list(args):
-    """Handle --execute-list command."""
-    try:
-        with open(args.execute_list, 'r') as f:
-            commands = [line.strip() for line in f if line.strip()]
-    except FileNotFoundError:
-        print(f"Error: Command file '{args.execute_list}' not found")
-        return 1
-    
-    results = stubs.execute_command_sequence(
-        commands=commands,
-        verify=args.verify,
-        timeout=args.timeout
-    )
-    
-    if args.json:
-        print(json.dumps(results, indent=2))
-    else:
-        print(f"\nExecuting {len(commands)} commands:")
-        print("-" * 40)
-        for i, result in enumerate(results, 1):
-            status = "OK" if result['success'] else "FAIL"
-            print(f"{i}. [{status}] '{result['command']}' - {result['response_time']:.3f}s")
+    if len(commands) == 1:
+        # Single command
+        result = stubs.execute_command(
+            command=commands[0],
+            verify=args.verify,
+            timeout=args.timeout
+        )
+        
+        if args.json:
+            print(json.dumps(result, indent=2))
+        else:
+            print(f"\nCommand: '{result['command']}'")
+            print(f"Success: {result['success']}")
+            print(f"Response Time: {result['response_time']:.3f}s")
             if result['error']:
-                print(f"   Error: {result['error']}")
-    
-    failed = sum(1 for r in results if not r['success'])
-    return failed
+                print(f"Error: {result['error']}")
+        
+        return 0 if result['success'] else 1
+    else:
+        # Multiple commands
+        results = stubs.execute_command_sequence(
+            commands=commands,
+            verify=args.verify,
+            timeout=args.timeout
+        )
+        
+        if args.json:
+            print(json.dumps(results, indent=2))
+        else:
+            print(f"\nExecuting {len(commands)} commands:")
+            print("-" * 40)
+            for i, result in enumerate(results, 1):
+                status = "OK" if result['success'] else "FAIL"
+                print(f"{i}. [{status}] '{result['command']}' - {result['response_time']:.3f}s")
+                if result['error']:
+                    print(f"   Error: {result['error']}")
+        
+        failed = sum(1 for r in results if not r['success'])
+        return failed
+
 
 def handle_read_window(args):
     """Handle --read-window command."""
@@ -108,6 +106,7 @@ def handle_read_windows(args):
 
 def handle_execute_and_read(args):
     """Handle combined --execute and --read-window."""
+    # Parse commands - for execute+read, treat as single command string
     result = stubs.execute_and_read(
         command=args.execute,
         window_title=args.read_window,
@@ -139,7 +138,7 @@ def main():
 Examples:
   %(prog)s --list-windows
   %(prog)s --execute "choose 1" --verify
-  %(prog)s --execute-list commands.txt --verify
+  %(prog)s --execute "choose 1,play 0,end" --verify
   %(prog)s --read-window "Map"
   %(prog)s --execute "end" --read-window "Event" --verify
   %(prog)s --read-windows "Map,Hand,Player"
@@ -150,9 +149,7 @@ Examples:
     parser.add_argument('--list-windows', action='store_true',
                         help='List all available Text the Spire windows')
     parser.add_argument('--execute', metavar='COMMAND',
-                        help='Execute a single command')
-    parser.add_argument('--execute-list', metavar='FILE',
-                        help='Execute commands from a file (one per line)')
+                        help='Execute one or more commands (comma-separated for multiple)')
     parser.add_argument('--read-window', metavar='WINDOW',
                         help='Read content from a specific window')
     parser.add_argument('--read-windows', metavar='WINDOWS',
@@ -171,7 +168,7 @@ Examples:
     args = parser.parse_args()
     
     # Validate arguments
-    if not any([args.list_windows, args.execute, args.execute_list, 
+    if not any([args.list_windows, args.execute, 
                 args.read_window, args.read_windows]):
         parser.error('No action specified. Use --help for usage information.')
     
@@ -183,8 +180,6 @@ Examples:
             return handle_execute_and_read(args)
         elif args.execute:
             return handle_execute_command(args)
-        elif args.execute_list:
-            return handle_execute_list(args)
         elif args.read_windows:
             return handle_read_windows(args)
         elif args.read_window:
