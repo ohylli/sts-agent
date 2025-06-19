@@ -152,7 +152,10 @@ python.exe sts_tool.py --list-windows --debug
 {
   "success": true,
   "command": "choose 1",
-  "response_time": 0.249,
+  "response_time": 5.436,
+  "wait_time_used": 5.0,
+  "command_found_in_log": true,
+  "log_response": "choose 1",
   "error": null
 }
 ```
@@ -200,13 +203,13 @@ python.exe sts_tool.py --list-windows --debug
 
 ### Basic Combat Turn
 ```bash
-# View current game state (REAL - shows actual game data)
-python.exe sts_tool.py --read-windows "Player,Hand,Monster"
+# View current game state
+python.exe sts_tool.py --read-window "Player,Hand,Monster"
 
-# Play a card (STUB - simulated execution)
+# Play a card
 python.exe sts_tool.py --execute "play 0" --verify
 
-# End turn (STUB - simulated execution)
+# End turn
 python.exe sts_tool.py --execute "end" --verify
 ```
 
@@ -235,9 +238,11 @@ python.exe sts_tool.py --execute "choose 1,play 0,play 1,end" --verify
 - **Text extraction**: 0.006s for 3 windows (exceeds 25,000 chars/second)
 - **Multi-window reading**: Scales linearly, very efficient
 
-### Expected (From Phase 1 Testing)
+### Measured (Real Implementation)
 - **Command execution**: ~250ms input latency
-- **Response verification**: <5ms response time
+- **Quick commands**: 1.0s total time (help, info, tutorial, version)
+- **Slow commands**: 5.0s total time (end, choose, play, quit, continue)
+- **Response verification**: <5ms via Log window
 - **Reliability**: >90% command success rate with smart clearing
 
 ## Error Handling
@@ -252,18 +257,18 @@ The tool provides clear error messages for common issues:
 ### Fully Implemented (Real) ✅
 - `--list-windows`: Enumerates actual Text the Spire windows
 - `--read-window`: Reads real game state from single or multiple windows (comma-separated)
+- `--execute`: Sends commands to Prompt window with smart clearing
+- `--verify`: Verifies command execution via Log window
 - Window detection and filtering by class/title
 - Text extraction using pywinauto (children aggregation method)
+- Command categorization (quick vs slow commands)
+- Log-based response detection
 - Error handling for missing/inaccessible windows
 
-### Stub Implementation (Simulated) ⏳
-- `--execute`: Command sending simulated (single and multiple commands)
-- `--verify`: Response verification simulated
-- Command timing and success rates based on real metrics
 
 ### Current Limitations
 
-1. **Command Execution**: Still using stubs for safety during development
-2. **Windows Only**: Text the Spire mod is Windows-specific
-3. **Single Instance**: Assumes one game instance running
-4. **Sequential Commands**: No parallel command execution
+1. **Windows Only**: Text the Spire mod is Windows-specific
+2. **Single Instance**: Assumes one game instance running
+3. **Sequential Commands**: No parallel command execution
+4. **Log Parsing**: Basic response extraction (may need enhancement for complex responses)
