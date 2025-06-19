@@ -66,7 +66,7 @@ def handle_execute_command(args):
             print("-" * 40)
             for i, result in enumerate(results, 1):
                 status = "OK" if result['success'] else "FAIL"
-                log_status = "✓" if result['command_found_in_log'] else "✗"
+                log_status = "Y" if result['command_found_in_log'] else "N"
                 print(f"{i}. [{status}] '{result['command']}' - {result['response_time']:.3f}s (wait: {result['wait_time_used']:.1f}s) Log: {log_status}")
                 if result['log_response']:
                     print(f"   Response: {result['log_response']}")
