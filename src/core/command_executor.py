@@ -7,7 +7,7 @@ from pywinauto import Application
 from sts_types import CommandResult
 from utils.constants import (
     QUICK_COMMAND_WAIT, SLOW_COMMAND_WAIT, 
-    QUICK_COMMANDS, SLOW_COMMANDS,
+    SLOW_COMMANDS,
     AVERAGE_INPUT_LATENCY, PROMPT_WINDOW_TITLES
 )
 from .text_extractor import read_window, _get_window_handle
@@ -17,9 +17,7 @@ def get_command_wait_time(command: str) -> float:
     # Extract first word from command for categorization
     first_word = command.strip().split()[0].lower() if command.strip() else ""
     
-    if first_word in QUICK_COMMANDS:
-        return QUICK_COMMAND_WAIT
-    elif first_word in SLOW_COMMANDS:
+    if first_word in SLOW_COMMANDS:
         return SLOW_COMMAND_WAIT
     else:
         # Default to quick command wait time
