@@ -43,6 +43,10 @@ def handle_execute_command(args):
             print(f"\nCommand: '{result['command']}'")
             print(f"Success: {result['success']}")
             print(f"Response Time: {result['response_time']:.3f}s")
+            print(f"Wait Time: {result['wait_time_used']:.1f}s")
+            print(f"Command Found in Log: {result['command_found_in_log']}")
+            if result['log_response']:
+                print(f"Response: {result['log_response']}")
             if result['error']:
                 print(f"Error: {result['error']}")
         
@@ -62,7 +66,10 @@ def handle_execute_command(args):
             print("-" * 40)
             for i, result in enumerate(results, 1):
                 status = "OK" if result['success'] else "FAIL"
-                print(f"{i}. [{status}] '{result['command']}' - {result['response_time']:.3f}s")
+                log_status = "✓" if result['command_found_in_log'] else "✗"
+                print(f"{i}. [{status}] '{result['command']}' - {result['response_time']:.3f}s (wait: {result['wait_time_used']:.1f}s) Log: {log_status}")
+                if result['log_response']:
+                    print(f"   Response: {result['log_response']}")
                 if result['error']:
                     print(f"   Error: {result['error']}")
         

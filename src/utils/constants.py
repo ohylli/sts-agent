@@ -17,3 +17,13 @@ AVERAGE_RESPONSE_TIME = 0.002  # From testing
 
 # Command execution
 MAX_RELIABLE_COMMANDS_PER_SECOND = 4
+
+# Command wait times (in seconds)
+QUICK_COMMAND_WAIT = 1.0  # For info commands like help, tutorial, info, version
+SLOW_COMMAND_WAIT = 5.0   # For game state commands like end, choose, play
+
+# Quick commands (don't change game state, respond fast)
+QUICK_COMMANDS = {"help", "tutorial", "info", "version"}
+
+# Slow commands (change game state, may have animations)
+SLOW_COMMANDS = {"end", "choose", "play"}

@@ -13,6 +13,9 @@ class CommandResult(TypedDict):
     success: bool
     command: str
     response_time: float
+    wait_time_used: float
+    command_found_in_log: bool
+    log_response: Optional[str]
     error: Optional[str]
 
 class ExecuteAndReadResult(TypedDict):

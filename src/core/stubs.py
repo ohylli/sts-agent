@@ -8,36 +8,14 @@ from .window_finder import list_windows  # Use real implementation
 from .text_extractor import read_window as _read_window, read_multiple_windows as _read_multiple_windows
 
 def execute_command(command: str, verify: bool = False, timeout: float = 5.0) -> CommandResult:
-    """Stub: Execute a command in the Prompt window."""
-    print(f"[STUB] Would send command to Prompt window: '{command}'")
-    
-    if verify:
-        print(f"[STUB] Would verify command execution via Log window (timeout: {timeout}s)")
-        print(f"[STUB] Expected response time: ~{AVERAGE_RESPONSE_TIME}s")
-    
-    # Simulate execution time
-    time.sleep(0.1)
-    
-    return {
-        "success": True,
-        "command": command,
-        "response_time": AVERAGE_INPUT_LATENCY,
-        "error": None
-    }
+    """Execute a command in the Prompt window using real implementation."""
+    from .command_executor import execute_command as _execute_command
+    return _execute_command(command, verify=verify, timeout=timeout)
 
 def execute_command_sequence(commands: List[str], verify: bool = False, timeout: float = 5.0) -> List[CommandResult]:
-    """Stub: Execute a sequence of commands."""
-    print(f"[STUB] Would execute {len(commands)} commands in sequence")
-    if verify:
-        print("[STUB] Each command would be verified before proceeding to next")
-    
-    results = []
-    for i, cmd in enumerate(commands, 1):
-        print(f"[STUB] Command {i}/{len(commands)}: '{cmd}'")
-        result = execute_command(cmd, verify=verify, timeout=timeout)
-        results.append(result)
-    
-    return results
+    """Execute a sequence of commands using real implementation."""
+    from .command_executor import execute_command_sequence as _execute_command_sequence
+    return _execute_command_sequence(commands, verify=verify, timeout=timeout)
 
 def read_window(window_title: str) -> WindowContent:
     """Read content from a specific window using real text extractor."""
