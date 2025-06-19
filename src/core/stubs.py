@@ -26,9 +26,7 @@ def read_multiple_windows(window_titles: List[str]) -> MultiWindowContent:
     return _read_multiple_windows(window_titles)
 
 def execute_and_read(command: str, window_title: str, verify: bool = True, timeout: float = 5.0) -> ExecuteAndReadResult:
-    """Stub: Execute a command and then read a window."""
-    print(f"[STUB] Would execute command '{command}' and then read '{window_title}' window")
-    
+    """Execute a command and then read a window."""
     # Execute command
     cmd_result = execute_command(command, verify=verify, timeout=timeout)
     
