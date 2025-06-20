@@ -7,11 +7,6 @@ from utils.constants import GAME_STATE_WINDOWS, AVERAGE_INPUT_LATENCY, AVERAGE_R
 from .window_finder import list_windows  # Use real implementation
 from .text_extractor import read_window as _read_window, read_multiple_windows as _read_multiple_windows
 
-def execute_command(command: str, verify: bool = False, timeout: float = 5.0) -> CommandResult:
-    """Execute a command in the Prompt window using real implementation."""
-    from .command_executor import execute_command as _execute_command
-    return _execute_command(command, verify=verify, timeout=timeout)
-
 def execute_command_sequence(commands: List[str], verify: bool = False, timeout: float = 5.0) -> List[CommandResult]:
     """Execute a sequence of commands using real implementation."""
     from .command_executor import execute_command_sequence as _execute_command_sequence
@@ -28,7 +23,8 @@ def read_multiple_windows(window_titles: List[str]) -> MultiWindowContent:
 def execute_and_read(command: str, window_title: str, verify: bool = True, timeout: float = 5.0) -> ExecuteAndReadResult:
     """Execute a command and then read a window."""
     # Execute command
-    cmd_result = execute_command(command, verify=verify, timeout=timeout)
+    cmd_results = execute_command_sequence([command], verify=verify, timeout=timeout)
+    cmd_result = cmd_results[0]
     
     # Read window
     window_content = read_window(window_title)

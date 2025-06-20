@@ -29,52 +29,40 @@ def handle_execute_command(args):
     # Parse commands - split by comma and strip whitespace
     commands = [cmd.strip() for cmd in args.execute.split(',') if cmd.strip()]
     
-    if len(commands) == 1:
-        # Single command
-        result = stubs.execute_command(
-            command=commands[0],
-            verify=args.verify,
-            timeout=args.timeout
-        )
-        
-        if args.json:
-            print(json.dumps(result, indent=2))
+    # Always use sequence execution (single command is just a sequence of 1)
+    results = stubs.execute_command_sequence(
+        commands=commands,
+        verify=args.verify,
+        timeout=args.timeout
+    )
+    
+    if args.json:
+        # For JSON output, return single object if single command, array if multiple
+        if len(commands) == 1:
+            print(json.dumps(results[0], indent=2))
         else:
-            print(f"\nCommand: '{result['command']}'")
-            print(f"Success: {result['success']}")
-            print(f"Response Time: {result['response_time']:.3f}s")
-            print(f"Wait Time: {result['wait_time_used']:.1f}s")
-            print(f"Command Found in Log: {result['command_found_in_log']}")
-            if result['log_response']:
-                print(f"Response: {result['log_response']}")
-            if result['error']:
-                print(f"Error: {result['error']}")
-        
-        return 0 if result['success'] else 1
-    else:
-        # Multiple commands
-        results = stubs.execute_command_sequence(
-            commands=commands,
-            verify=args.verify,
-            timeout=args.timeout
-        )
-        
-        if args.json:
             print(json.dumps(results, indent=2))
+    else:
+        # Use detailed format for all commands
+        if len(commands) == 1:
+            print(f"\nExecuting 1 command:")
         else:
             print(f"\nExecuting {len(commands)} commands:")
-            print("-" * 40)
-            for i, result in enumerate(results, 1):
-                status = "OK" if result['success'] else "FAIL"
-                log_status = "Y" if result['command_found_in_log'] else "N"
-                print(f"{i}. [{status}] '{result['command']}' - {result['response_time']:.3f}s (wait: {result['wait_time_used']:.1f}s) Log: {log_status}")
-                if result['log_response']:
-                    print(f"   Response: {result['log_response']}")
-                if result['error']:
-                    print(f"   Error: {result['error']}")
+        print("-" * 40)
         
-        failed = sum(1 for r in results if not r['success'])
-        return failed
+        for i, result in enumerate(results, 1):
+            print(f"\n{i}. Command: '{result['command']}'")
+            print(f"   Success: {result['success']}")
+            print(f"   Response Time: {result['response_time']:.3f}s")
+            print(f"   Wait Time: {result['wait_time_used']:.1f}s")
+            print(f"   Command Found in Log: {result['command_found_in_log']}")
+            if result['log_response']:
+                print(f"   Response: {result['log_response']}")
+            if result['error']:
+                print(f"   Error: {result['error']}")
+    
+    failed = sum(1 for r in results if not r['success'])
+    return failed
 
 
 def handle_read_window(args):
