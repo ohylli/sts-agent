@@ -83,7 +83,7 @@ Execute one or more commands and immediately read one or more windows.
 python.exe sts_tool.py --execute "end" --read-window "Event"
 
 # Multiple commands with single window read
-python.exe sts_tool.py --execute "play 0,play 1,end" --read-window "Monster"
+python.exe sts_tool.py --execute "1,2,end" --read-window "Monster"
 
 # Single command with multiple window read
 python.exe sts_tool.py --execute "end" --read-window "Player,Monster"
@@ -207,7 +207,7 @@ python.exe sts_tool.py --list-windows --debug
 python.exe sts_tool.py --read-window "Player,Hand,Monster"
 
 # Play a card
-python.exe sts_tool.py --execute "play 0" --verify
+python.exe sts_tool.py --execute "1" --verify
 
 # End turn
 python.exe sts_tool.py --execute "end" --verify
