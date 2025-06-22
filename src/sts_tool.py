@@ -102,30 +102,6 @@ def handle_read_window(args):
         
         return 0
 
-def handle_execute_and_read(args):
-    """Handle combined --execute and --read-window."""
-    # Parse commands - for execute+read, treat as single command string
-    result = stubs.execute_and_read(
-        command=args.execute,
-        window_title=args.read_window,
-        verify=not args.dont_verify,
-        timeout=args.timeout
-    )
-    
-    if args.json:
-        print(json.dumps(result, indent=2))
-    else:
-        print(f"\nExecuted: '{result['command']}'")
-        print(f"Success: {result['command_success']}")
-        print(f"Response Time: {result['response_time']:.3f}s")
-        
-        if result['error']:
-            print(f"Error: {result['error']}")
-        else:
-            print(f"\n=== {args.read_window} Window ===")
-            print(result['window_content'])
-    
-    return 0 if result['command_success'] and not result['error'] else 1
 
 def main():
     """Main CLI entry point."""
