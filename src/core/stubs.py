@@ -20,19 +20,3 @@ def read_multiple_windows(window_titles: List[str]) -> MultiWindowContent:
     """Read content from multiple windows using real text extractor."""
     return _read_multiple_windows(window_titles)
 
-def execute_and_read(command: str, window_title: str, verify: bool = True, timeout: float = 5.0) -> ExecuteAndReadResult:
-    """Execute a command and then read a window."""
-    # Execute command
-    cmd_results = execute_command_sequence([command], verify=verify, timeout=timeout)
-    cmd_result = cmd_results[0]
-    
-    # Read window
-    window_content = read_window(window_title)
-    
-    return {
-        "command_success": cmd_result["success"],
-        "command": command,
-        "response_time": cmd_result["response_time"],
-        "window_content": window_content["content"],
-        "error": cmd_result["error"] or window_content["error"]
-    }

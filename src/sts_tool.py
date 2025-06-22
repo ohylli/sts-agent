@@ -169,20 +169,21 @@ Examples:
     
     # Handle commands
     try:
+        if args.execute:
+            handle_execute_command(args)
+        if args.read_window:
+            handle_read_window(args)
         if args.list_windows:
-            return handle_list_windows(args)
-        elif args.execute and args.read_window:
-            return handle_execute_and_read(args)
-        elif args.execute:
-            return handle_execute_command(args)
-        elif args.read_window:
-            return handle_read_window(args)
+            handle_list_windows(args)
     except KeyboardInterrupt:
         print("\nOperation cancelled by user")
         return 1
     except Exception as e:
         print(f"Error: {e}")
         return 1
+    
+    return 0
+
 
 if __name__ == "__main__":
     sys.exit(main())
