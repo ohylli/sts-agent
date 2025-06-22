@@ -32,7 +32,7 @@ def handle_execute_command(args):
     # Always use sequence execution (single command is just a sequence of 1)
     results = stubs.execute_command_sequence(
         commands=commands,
-        verify=args.verify,
+        verify=not args.dont_verify,
         timeout=args.timeout
     )
     
@@ -108,7 +108,7 @@ def handle_execute_and_read(args):
     result = stubs.execute_and_read(
         command=args.execute,
         window_title=args.read_window,
-        verify=args.verify,
+        verify=not args.dont_verify,
         timeout=args.timeout
     )
     
@@ -135,10 +135,10 @@ def main():
         epilog="""
 Examples:
   %(prog)s --list-windows
-  %(prog)s --execute "choose 1" --verify
-  %(prog)s --execute "choose 1,play 0,end" --verify
+  %(prog)s --execute "choose 1" --dont-verify
+  %(prog)s --execute "choose 1,play 0,end"
   %(prog)s --read-window "Map"
-  %(prog)s --execute "end" --read-window "Event" --verify
+  %(prog)s --execute "end" --read-window "Event"
   %(prog)s --read-window "Map,Hand,Player"
         """
     )
@@ -152,8 +152,8 @@ Examples:
                         help='Read content from one or more windows (comma-separated for multiple)')
     
     # Options
-    parser.add_argument('--verify', action='store_true',
-                        help='Verify command execution via Log window')
+    parser.add_argument('--dont-verify', action='store_true',
+                        help='Do not verify command execution via Log window')
     parser.add_argument('--timeout', type=float, default=DEFAULT_COMMAND_TIMEOUT,
                         help=f'Command timeout in seconds (default: {DEFAULT_COMMAND_TIMEOUT})')
     parser.add_argument('--json', action='store_true',

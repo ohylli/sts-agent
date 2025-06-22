@@ -91,18 +91,18 @@ python.exe sts_tool.py --execute "end" --read-window "Player,Monster"
 
 ## Options
 
-### `--verify`
-Verify command execution by checking the Log window for response.
+### `--dont-verify`
+Do not verify command execution by checking the Log window for response.
 
 ```bash
-python.exe sts_tool.py --execute "choose 1" --verify
+python.exe sts_tool.py --execute "choose 1" --dont-verify
 ```
 
 ### `--timeout SECONDS`
 Set command timeout (default: 5.0 seconds).
 
 ```bash
-python.exe sts_tool.py --execute "choose 1" --verify --timeout 10
+python.exe sts_tool.py --execute "choose 1" --timeout 10
 ```
 
 ### `--json`
@@ -207,10 +207,10 @@ python.exe sts_tool.py --list-windows --debug
 python.exe sts_tool.py --read-window "Player,Hand,Monster"
 
 # Play a card
-python.exe sts_tool.py --execute "1" --verify
+python.exe sts_tool.py --execute "1"
 
 # End turn
-python.exe sts_tool.py --execute "end" --verify
+python.exe sts_tool.py --execute "end"
 ```
 
 ### Navigation
@@ -219,16 +219,16 @@ python.exe sts_tool.py --execute "end" --verify
 python.exe sts_tool.py --read-window "Map"
 
 # Make choice
-python.exe sts_tool.py --execute "choose 2" --verify
+python.exe sts_tool.py --execute "choose 2"
 
 # Proceed
-python.exe sts_tool.py --execute "proceed" --verify
+python.exe sts_tool.py --execute "proceed"
 ```
 
 ### Batch Processing
 ```bash
 # Execute sequence of commands
-python.exe sts_tool.py --execute "choose 1,play 0,play 1,end" --verify
+python.exe sts_tool.py --execute "choose 1,play 0,play 1,end"
 ```
 
 ## Performance Characteristics
@@ -258,7 +258,7 @@ The tool provides clear error messages for common issues:
 - `--list-windows`: Enumerates actual Text the Spire windows
 - `--read-window`: Reads real game state from single or multiple windows (comma-separated)
 - `--execute`: Sends commands to Prompt window with smart clearing
-- `--verify`: Verifies command execution via Log window
+- `--dont-verify`: Does not verify command execution via Log window
 - Window detection and filtering by class/title
 - Text extraction using pywinauto (children aggregation method)
 - Command categorization (quick vs slow commands)
