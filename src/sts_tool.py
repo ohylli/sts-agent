@@ -7,6 +7,7 @@ import sys
 from typing import List
 
 from core import stubs
+from core.speaker import Speaker
 from utils.constants import DEFAULT_COMMAND_TIMEOUT
 
 def handle_list_windows(args):
@@ -103,6 +104,24 @@ def handle_read_window(args):
         return 0
 
 
+def handle_speak(args, speaker):
+    """Handle --speak command."""
+    success = speaker.speak(args.speak)
+    
+    if args.json:
+        result = {
+            "text": args.speak,
+            "success": success,
+            "error": None if success else "Speech failed - check API key"
+        }
+        print(json.dumps(result, indent=2))
+    else:
+        if not success:
+            print("Speech failed - check ELEVENLABS_API_KEY in .env file")
+    
+    return 0 if success else 1
+
+
 def main():
     """Main CLI entry point."""
     parser = argparse.ArgumentParser(
@@ -116,6 +135,7 @@ Examples:
   %(prog)s --read-window "Map"
   %(prog)s --execute "end" --read-window "Event"
   %(prog)s --read-window "Map,Hand,Player"
+  %(prog)s --speak "I'm going to play a strike card" --execute "play 0"
         """
     )
     
@@ -126,6 +146,8 @@ Examples:
                         help='Execute one or more commands (comma-separated for multiple)')
     parser.add_argument('--read-window', metavar='WINDOW[,WINDOW2,...]',
                         help='Read content from one or more windows (comma-separated for multiple)')
+    parser.add_argument('--speak', metavar='TEXT',
+                        help='Speak the given text using text-to-speech')
     
     # Options
     parser.add_argument('--dont-verify', action='store_true',
@@ -140,17 +162,32 @@ Examples:
     args = parser.parse_args()
     
     # Validate arguments
-    if not any([args.list_windows, args.execute, args.read_window]):
+    if not any([args.list_windows, args.execute, args.read_window, args.speak]):
         parser.error('No action specified. Use --help for usage information.')
+    
+    # Initialize speaker if needed
+    speaker = None
+    if args.speak:
+        speaker = Speaker()
     
     # Handle commands
     try:
+        # Handle speak first if provided
+        if args.speak:
+            handle_speak(args, speaker)
+        
+        # Then handle other commands
         if args.execute:
             handle_execute_command(args)
         if args.read_window:
             handle_read_window(args)
         if args.list_windows:
             handle_list_windows(args)
+            
+        # Wait for speech to complete if it was started
+        if speaker:
+            speaker.wait_for_completion()
+            
     except KeyboardInterrupt:
         print("\nOperation cancelled by user")
         return 1
