@@ -21,9 +21,9 @@ class Speaker:
         
         # Audio settings
         self.chunk_size = 1024
-        self.sample_rate = 44100
+        self.sample_rate = 16000  # Using 16kHz PCM format
         self.channels = 1
-        self.sample_width = 2  # 16-bit audio
+        self.sample_width = 2  # 16-bit audio (S16LE)
         
         # PyAudio instance
         self.pyaudio = None
@@ -96,14 +96,18 @@ class Speaker:
                 }
             }
             
-            # Make streaming request
-            response = requests.post(url, headers=headers, json=data, stream=True)
+            # Make streaming request with PCM output format
+            params = {"output_format": "pcm_16000"}  # Request 16kHz PCM format
+            response = requests.post(url, headers=headers, json=data, params=params, stream=True)
             
             if response.ok:
                 # Play audio chunks as they arrive
+                bytes_received = 0
                 for chunk in response.iter_content(chunk_size=self.chunk_size):
                     if chunk:
+                        bytes_received += len(chunk)
                         self.stream.write(chunk)
+                print(f"Speech playback complete ({bytes_received} bytes)")
                 return True
             else:
                 print(f"Speech error: {response.status_code} - {response.text}")
