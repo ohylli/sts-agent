@@ -4,6 +4,8 @@ import os
 import threading
 import requests
 import pyaudio
+import queue
+import time
 from typing import Optional
 from dotenv import load_dotenv
 
@@ -20,10 +22,11 @@ class Speaker:
         self.model = "eleven_flash_v2_5"
         
         # Audio settings
-        self.chunk_size = 1024
+        self.chunk_size = 4096  # Optimized chunk size
         self.sample_rate = 16000  # Using 16kHz PCM format
         self.channels = 1
         self.sample_width = 2  # 16-bit audio (S16LE)
+        self.frames_per_buffer = 2048  # Separate buffer size for PyAudio
         
         # PyAudio instance
         self.pyaudio = None
@@ -69,13 +72,15 @@ class Speaker:
             # Initialize PyAudio
             self.pyaudio = pyaudio.PyAudio()
             
-            # Open audio stream
+            # Open audio stream with optimized parameters
             self.stream = self.pyaudio.open(
                 format=pyaudio.paInt16,
                 channels=self.channels,
                 rate=self.sample_rate,
                 output=True,
-                frames_per_buffer=self.chunk_size
+                frames_per_buffer=self.frames_per_buffer,
+                output_device_index=None,  # Use default device
+                stream_callback=None  # Blocking mode
             )
             
             # Prepare API request
@@ -101,13 +106,30 @@ class Speaker:
             response = requests.post(url, headers=headers, json=data, params=params, stream=True)
             
             if response.ok:
-                # Play audio chunks as they arrive
+                # Collect all audio data first
+                audio_data = b''
                 bytes_received = 0
+                
+                print("Downloading audio...")
                 for chunk in response.iter_content(chunk_size=self.chunk_size):
                     if chunk:
+                        audio_data += chunk
                         bytes_received += len(chunk)
-                        self.stream.write(chunk)
-                print(f"Speech playback complete ({bytes_received} bytes)")
+                
+                print(f"Downloaded {bytes_received} bytes, starting playback...")
+                
+                # Play audio data in properly sized chunks for PyAudio
+                # Use frames_per_buffer size for playback
+                playback_chunk_size = self.frames_per_buffer * self.sample_width
+                
+                for i in range(0, len(audio_data), playback_chunk_size):
+                    chunk = audio_data[i:i + playback_chunk_size]
+                    # Pad the last chunk if needed
+                    if len(chunk) < playback_chunk_size:
+                        chunk += b'\x00' * (playback_chunk_size - len(chunk))
+                    self.stream.write(chunk)
+                
+                print(f"Speech playback complete")
                 return True
             else:
                 print(f"Speech error: {response.status_code} - {response.text}")
