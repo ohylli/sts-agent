@@ -9,6 +9,7 @@ This is a Python toolkit for enabling Claude Code to play Slay the Spire through
 - Read game state from Text the Spire's text windows
 - Send commands through Text the Spire's prompt window
 - Parse and understand game mechanics
+- Provide audio feedback through text-to-speech integration
 
 **Key Architecture Principle**: Claude Code is the player making all strategic decisions. The Python tools only provide the interface to interact with the game - they do NOT make gameplay decisions.
 

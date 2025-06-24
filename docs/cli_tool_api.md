@@ -73,6 +73,27 @@ python.exe sts_tool.py --execute "choose 1"
 python.exe sts_tool.py --execute "choose 1,play 0,end"
 ```
 
+### Audio Features
+
+#### `--speak TEXT`
+Provide audio feedback using text-to-speech.
+
+**Parameters**:
+- `TEXT`: Text to convert to speech (any length supported)
+
+**Features**:
+- Uses ElevenLabs API for high-quality speech synthesis
+- Plays audio asynchronously - other operations can proceed while speaking
+- Optimized for clear playback without crackling
+
+```bash
+# Simple speech
+python.exe sts_tool.py --speak "Welcome to Slay the Spire"
+
+# Longer text
+python.exe sts_tool.py --speak "You have entered combat. The enemy is attacking for 10 damage."
+```
+
 ### Combined Operations
 
 #### `--execute COMMAND[,COMMAND2,...] --read-window WINDOW[,WINDOW2,...]`
@@ -87,6 +108,12 @@ python.exe sts_tool.py --execute "1,2,end" --read-window "Monster"
 
 # Single command with multiple window read
 python.exe sts_tool.py --execute "end" --read-window "Player,Monster"
+
+# Speech with command execution
+python.exe sts_tool.py --speak "Playing a Strike card" --execute "play 0"
+
+# Speech with window reading
+python.exe sts_tool.py --speak "Checking game state" --read-window "Player,Hand"
 ```
 
 ## Options
@@ -188,6 +215,15 @@ python.exe sts_tool.py --list-windows --debug
 }
 ```
 
+### Speak Result
+```json
+{
+  "success": true,
+  "message": "Audio playback started",
+  "error": null
+}
+```
+
 ### Execute and Read Result
 ```json
 {
@@ -231,6 +267,21 @@ python.exe sts_tool.py --execute "proceed"
 python.exe sts_tool.py --execute "choose 1,play 0,play 1,end"
 ```
 
+### Audio Feedback Workflow
+```bash
+# Announce game start
+python.exe sts_tool.py --speak "Starting new combat encounter"
+
+# Narrate card plays with audio
+python.exe sts_tool.py --speak "Playing Strike for 6 damage" --execute "play 0"
+
+# Provide status updates
+python.exe sts_tool.py --speak "Enemy defeated! Victory achieved." --read-window "Event"
+
+# Chain multiple actions with narration
+python.exe sts_tool.py --speak "Ending turn" --execute "end" --read-window "Monster"
+```
+
 ## Performance Characteristics
 
 ### Measured (Real Implementation)
@@ -264,6 +315,7 @@ The tool provides clear error messages for common issues:
 - Command categorization (quick vs slow commands)
 - Log-based response detection
 - Error handling for missing/inaccessible windows
+- `--speak`: Text-to-speech using ElevenLabs API with PyAudio playback
 
 
 ### Current Limitations
