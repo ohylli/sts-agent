@@ -18,7 +18,7 @@ class Speaker:
     def __init__(self):
         """Initialize the speaker with API credentials and audio settings."""
         self.api_key = os.getenv("ELEVENLABS_API_KEY")
-        self.voice_id = "MphrLyAczpXnJIuHd3sx"  # WIL voice from speak.py
+        self.voice_id = "PyBPs4TifElCyta4uF2F"
         self.model = "eleven_flash_v2_5"
         
         # Audio settings
