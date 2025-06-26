@@ -19,7 +19,7 @@ class Speaker:
         """Initialize the speaker with API credentials and audio settings."""
         self.api_key = os.getenv("ELEVENLABS_API_KEY")
         self.voice_id = "PyBPs4TifElCyta4uF2F"
-        self.model = "eleven_flash_v2_5"
+        self.model = "eleven_turbo_v2_5"
         
         # Audio settings
         self.chunk_size = 4096  # Optimized chunk size
