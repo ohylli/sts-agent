@@ -50,6 +50,8 @@ class Speaker:
         Returns:
             True if speech started successfully, False otherwise
         """
+        # For some reason Claude code may insert \ characters in the text so clean the text before speaking.
+        text = text.replace( '\\', '' )
         if not self.api_key:
             return False
             
