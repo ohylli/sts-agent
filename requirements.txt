@@ -1,2 +1,5 @@
 pywinauto
 pywin32
+PyAudio==0.2.14
+python-dotenv==1.1.0
+requests==2.32.4
