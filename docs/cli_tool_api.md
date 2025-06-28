@@ -8,7 +8,7 @@ The `sts_tool.py` provides a command-line interface for interacting with Slay th
 
 ```bash
 # Install dependencies
-pip.exe install pywinauto pywin32
+pip.exe install -r requirements.txt
 
 # Run from src directory
 cd src

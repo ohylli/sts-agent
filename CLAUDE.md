@@ -22,8 +22,7 @@ This is a Python toolkit for enabling Claude Code to play Slay the Spire through
 ### Installation Commands
 ```bash
 # Install dependencies (use .exe versions for Windows compatibility in WSL)
-pip.exe install pywinauto
-pip.exe install pywin32
+pip.exe install -r requirements.txt
 ```
 
 ## Project Architecture
@@ -88,10 +87,11 @@ See documentation:
 - `src/` - Core CLI tool and modules
   - `sts_tool.py` - Main CLI entry point (with --debug option)
   - `core/` - Core functionality
-    - `stubs.py` - Partially replaced with real implementations
+    - `stubs.py` - Replaced with real implementations. TODO refactor code and remove this.
     - `window_finder.py` - Real window enumeration (implemented)
     - `text_extractor.py` - Real text extraction using pywinauto (implemented)
-    - `command_executor.py` - Command sending (pending)
+    - `command_executor.py` - Command sending
+    - `speaker.py` - Text to speech via ElevenLabs API.
   - `utils/` - Constants and utilities
   - `sts_types.py` - TypedDict definitions
 - `tests/` - Phase 1 testing scripts (pywinauto vs win32api, reliability tests, integration tests)
@@ -103,13 +103,6 @@ See documentation:
 - `docs/plan.md`: Complete technical design and implementation plan
 - `docs/tasks.md`: Phase 1 task list with specific testing objectives
 - `docs/textthespire.md`: Documentation about the Text the Spire mod
-
-## Testing Approach
-
-Phase 1 testing priorities:
-1. Window detection and text extraction from Text the Spire windows
-2. Command input through Text the Spire prompt window
-3. Reliability comparison between pywinauto vs win32api approaches
 
 ## Important Constraints
 

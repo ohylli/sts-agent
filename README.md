@@ -1,4 +1,4 @@
-# STS Agent - Slay the Spire AI Interface
+# STS Agent - Slay the Spire AI Agent Interface
 
 A Python toolkit that enables Claude Code to play Slay the Spire through the Text the Spire accessibility mod. This project provides a command-line interface for reading game state and sending commands, allowing AI agents to interact with the game programmatically. See [this demo video](https://www.youtube.com/watch?v=W46J357-c44) of Claude Code fighting an early game enemy.
 
