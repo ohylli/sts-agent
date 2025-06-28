@@ -31,6 +31,7 @@ The toolkit interacts exclusively with Text the Spire's accessibility features:
 3. **For audio feedback (optional)**:
    - Create a `.env` file in the project root
    - Add your ElevenLabs API key: `ELEVENLABS_API_KEY=your_key_here`
+   - Add the id of the voice you want to use `VOICE_ID=your_voice_id`
 
 ## Usage
 
