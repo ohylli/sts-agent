@@ -51,11 +51,10 @@ def send_command_to_prompt(command: str) -> bool:
         time.sleep(0.1)
         
         # Smart clearing approach from existing implementation
-        window.type_keys(" ")      # Type space (no error sound)
-        time.sleep(0.05)
         window.type_keys("^a")     # Select all
         time.sleep(0.05)
-        window.type_keys(command)  # Type command (replaces selection)
+        command = command.replace( ' ', '{SPACE}' )
+        window.type_keys(command)  # Type command (replaces selection if any)
         time.sleep(0.1)
         window.type_keys("{ENTER}")
         
