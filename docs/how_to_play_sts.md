@@ -7,23 +7,23 @@ This guide provides comprehensive instructions for AI agents to play Slay the Sp
 ### Essential CLI Commands
 ```bash
 # Read game state
-python.exe sts_tool.py --read-window "Player,Hand,Monster"
+python.exe src/sts_tool.py --read-window "Player,Hand,Monster"
 
 # Play cards (by position in hand)
-python.exe sts_tool.py --execute "2"  # Play card at position 2
-python.exe sts_tool.py --execute "1,3"  # Play multiple cards
+python.exe src/sts_tool.py --execute "2"  # Play card at position 2
+python.exe src/sts_tool.py --execute "1,3"  # Play multiple cards
 
 # End turn
-python.exe sts_tool.py --execute "end"
+python.exe src/sts_tool.py --execute "end"
 
 # Make choices
-python.exe sts_tool.py --execute "choose 1"
+python.exe src/sts_tool.py --execute "1"
 
 # Navigation
-python.exe sts_tool.py --execute "proceed"
+python.exe src/sts_tool.py --execute "proceed"
 
 # Combined operations
-python.exe sts_tool.py --execute "end" --read-window "Monster"
+python.exe src/sts_tool.py --execute "end" --read-window "Monster"
 ```
 
 ### Key Windows
@@ -64,34 +64,34 @@ Complete 3 acts, each containing:
 ### Reading Game State
 ```bash
 # Single window
-python.exe sts_tool.py --read-window "Player"
+python.exe src/sts_tool.py --read-window "Player"
 
 # Multiple windows (comma-separated)
-python.exe sts_tool.py --read-window "Player,Hand,Monster"
+python.exe src/sts_tool.py --read-window "Player,Hand,Monster"
 
 # List available windows
-python.exe sts_tool.py --list-windows
+python.exe src/sts_tool.py --list-windows
 ```
 
 ### Executing Actions
 ```bash
 # Single command
-python.exe sts_tool.py --execute "choose 1"
+python.exe src/sts_tool.py --execute "1"
 
 # Multiple commands (executed in sequence)
-python.exe sts_tool.py --execute "1,2,end"
+python.exe src/sts_tool.py --execute "1,2,end"
 
 # Skip verification for speed
-python.exe sts_tool.py --execute "end" --dont-verify
+python.exe src/sts_tool.py --execute "end" --dont-verify
 ```
 
 ### Efficient Patterns
 ```bash
 # Execute then read
-python.exe sts_tool.py --execute "end" --read-window "Monster,Player"
+python.exe src/sts_tool.py --execute "end" --read-window "Monster,Player"
 
 # JSON output for parsing
-python.exe sts_tool.py --read-window "Hand" --json
+python.exe src/sts_tool.py --read-window "Hand" --json
 ```
 
 ## 4. Combat System
@@ -112,26 +112,26 @@ When a card is played, remaining cards shift left. This affects multi-card plays
 **Method 1 - Right to Left** (when order doesn't matter):
 ```bash
 # To play all three Strikes at positions 1, 2, 5
-python.exe sts_tool.py --execute "5,2,1"
+python.exe src/sts_tool.py --execute "5,2,1"
 ```
 
 **Method 2 - Recalculate Positions** (when order matters):
 ```bash
 # To play Bash (pos 2) then Strike (pos 4)
 # After Bash is played, Strike shifts from 4 to 3
-python.exe sts_tool.py --execute "2,3"
+python.exe src/sts_tool.py --execute "2,3"
 ```
 
 #### Card Targeting
 ```bash
 # No target needed (single enemy or non-targeted)
-python.exe sts_tool.py --execute "1"
+python.exe src/sts_tool.py --execute "1"
 
 # With target (card position, enemy number)
-python.exe sts_tool.py --execute "1 2"  # Play card 1 on enemy 2
+python.exe src/sts_tool.py --execute "1 2"  # Play card 1 on enemy 2
 
 # Multiple targeted cards
-python.exe sts_tool.py --execute "1 1,3 2"  # Card 1 on enemy 1, card 3 on enemy 2
+python.exe src/sts_tool.py --execute "1 1,3 2"  # Card 1 on enemy 1, card 3 on enemy 2
 ```
 
 ### Combat Flow
@@ -144,14 +144,14 @@ python.exe sts_tool.py --execute "1 1,3 2"  # Card 1 on enemy 1, card 3 on enemy
 ### Potions
 ```bash
 # Use potion
-python.exe sts_tool.py --execute "pot u 1"  # Use potion 1
-python.exe sts_tool.py --execute "pot u 1 2"  # Use potion 1 on enemy 2
+python.exe src/sts_tool.py --execute "pot u 1"  # Use potion 1
+python.exe src/sts_tool.py --execute "pot u 1 2"  # Use potion 1 on enemy 2
 
 # Discard potion
-python.exe sts_tool.py --execute "pot d 1"
+python.exe src/sts_tool.py --execute "pot d 1"
 
 # Inspect potion
-python.exe sts_tool.py --execute "pot i 1"
+python.exe src/sts_tool.py --execute "pot i 1"
 ```
 
 ## 5. Navigation & Exploration
@@ -159,25 +159,25 @@ python.exe sts_tool.py --execute "pot i 1"
 ### Map Commands
 ```bash
 # View current map
-python.exe sts_tool.py --read-window "Map"
+python.exe src/sts_tool.py --read-window "Map"
 
 # Inspect specific path
-python.exe sts_tool.py --execute "map 6 4"  # Check path to floor 6, position 4
+python.exe src/sts_tool.py --execute "map 6 4"  # Check path to floor 6, position 4
 
 # Path analysis
-python.exe sts_tool.py --execute "path 6 4"  # Analyze all paths to destination
+python.exe src/sts_tool.py --execute "path 6 4"  # Analyze all paths to destination
 ```
 
 ### Movement
 ```bash
 # Check available choices
-python.exe sts_tool.py --read-window "Choices"
+python.exe src/sts_tool.py --read-window "Choices"
 
 # Select path (numbered choices)
-python.exe sts_tool.py --execute "choose 2"
+python.exe src/sts_tool.py --execute "2"
 
 # Proceed after events
-python.exe sts_tool.py --execute "proceed"
+python.exe src/sts_tool.py --execute "proceed"
 ```
 
 ## 6. Resource Management
@@ -190,19 +190,19 @@ python.exe sts_tool.py --execute "proceed"
 ### Relics
 ```bash
 # View relics
-python.exe sts_tool.py --read-window "Relic"
+python.exe src/sts_tool.py --read-window "Relic"
 
 # Inspect specific relic
-python.exe sts_tool.py --execute "relic 1"
+python.exe src/sts_tool.py --execute "relic 1"
 ```
 
 ### Deck Management
 ```bash
 # View full deck (out of combat)
-python.exe sts_tool.py --read-window "Deck"
+python.exe src/sts_tool.py --read-window "Deck"
 
 # During combat shows draw pile
-python.exe sts_tool.py --read-window "Deck,Discard,exhaust"
+python.exe src/sts_tool.py --read-window "Deck,Discard,exhaust"
 ```
 
 ## 7. Decision Making Patterns
@@ -210,18 +210,18 @@ python.exe sts_tool.py --read-window "Deck,Discard,exhaust"
 ### State Verification
 ```bash
 # Check if combat ended
-python.exe sts_tool.py --read-window "Monster"
+python.exe src/sts_tool.py --read-window "Monster"
 # Error = combat over
 
 # Verify action success
-python.exe sts_tool.py --read-window "Log"
+python.exe src/sts_tool.py --read-window "Log"
 ```
 
 ### Choice Inspection
 ```bash
 # Before selecting rewards/events
-python.exe sts_tool.py --execute "c 1"  # Inspect choice 1
-python.exe sts_tool.py --execute "c 2"  # Inspect choice 2
+python.exe src/sts_tool.py --execute "c 1"  # Inspect choice 1
+python.exe src/sts_tool.py --execute "c 2"  # Inspect choice 2
 ```
 
 ### Error Handling
@@ -240,13 +240,13 @@ python.exe sts_tool.py --execute "c 2"  # Inspect choice 2
 ### Using --speak Feature
 ```bash
 # Basic commentary
-python.exe sts_tool.py --speak "Starting combat against two Cultists"
+python.exe src/sts_tool.py --speak "Starting combat against two Cultists"
 
 # Combined with actions
-python.exe sts_tool.py --speak "Playing Strike for damage" --execute "1"
+python.exe src/sts_tool.py --speak "Playing Strike for damage" --execute "1"
 
 # Strategy narration
-python.exe sts_tool.py --speak "Defending this turn to block 15 damage" --execute "3,4,end"
+python.exe src/sts_tool.py --speak "Defending this turn to block 15 damage" --execute "3,4,end"
 ```
 
 ### Commentary Guidelines
@@ -265,17 +265,9 @@ Commentary style can be adjusted based on user preferences:
 ### Efficient Usage
 ```bash
 # Combine speak with other operations
-python.exe sts_tool.py --speak "Checking enemy patterns" --read-window "Monster,Player"
-python.exe sts_tool.py --speak "Time to go all-in with attacks" --execute "1,2,5,end"
+python.exe src/sts_tool.py --speak "Checking enemy patterns" --read-window "Monster,Player"
+python.exe src/sts_tool.py --speak "Time to go all-in with attacks" --execute "1,2,5,end"
 ```
-
-## Performance Notes
-
-- Window reading: ~0.006s for 3 windows
-- Command execution: ~0.25s input latency
-- Quick commands (help, info): 1s timeout
-- Slow commands (end, play, choose): 5s timeout
-- Reliability: >90% with smart clearing
 
 ## Key Reminders
 
