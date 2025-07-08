@@ -79,6 +79,15 @@ The `prompts/` directory contains example prompts for Claude Code:
 
 These prompts demonstrate how to instruct Claude to play the game effectively.  It is recommended to tell claude code to read them for instructions when in plan mode. Both these assume that game is in the start of early game combat against a single enemy.
 
+### Gameplay Guide
+
+For a comprehensive guide on how to play Slay the Spire through the CLI tool, see `docs/how_to_play_sts.md`. This guide includes:
+- Essential commands and syntax
+- Game mechanics and objectives
+- Combat system with hand reordering examples
+- Navigation and resource management
+- Audio commentary options
+
 ## Current Status and Limitations
 
 This is currently a proof-of-concept. It has been tested only in simple early game combats against a single enemy.
