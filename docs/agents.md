@@ -2,20 +2,6 @@
 
 This guide provides templates and best practices for using subagents effectively when playing Slay the Spire. Based on lessons learned from gameplay sessions.
 
-## What Worked Well
-
-1. **Combat Subagent** - Worked excellently after adding detailed command syntax rules
-2. **Card Reward Subagent** - Provided strategic analysis when used consistently  
-3. **Map Navigation Subagent** - Made solid strategic path choices
-4. **Event Subagent** - Handled risk/reward analysis effectively (Golden Idol)
-
-## What Didn't Work Well
-
-1. **Inconsistent Usage** - Forgot to use card reward subagent once
-2. **Initial Combat Failures** - Lacked specific command examples initially
-3. **Incomplete Reward Handling** - Only handled card selection, not full reward flow
-4. **Unstructured Returns** - Subagents didn't return consistent data formats
-
 ## Quick Reference Decision Tree
 
 **Always use subagents for these situations:**
