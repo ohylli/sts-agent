@@ -23,7 +23,6 @@ This guide provides templates and best practices for using subagents effectively
 - Any rewards after combat → Comprehensive Reward Subagent  
 - Map navigation choices → Map Navigation Subagent
 - Events/Campfires/Shops → Event/Campfire/Shop Subagent
-- Boss preparation → Boss Preparation Subagent
 
 ## Subagent Templates
 
@@ -182,38 +181,6 @@ Return structured summary:
 - **Resource Trade**: [WHAT GAINED/LOST]
 - **Strategic Justification**: [WHY THIS CHOICE]
 - **Health/Deck Impact**: [IMMEDIATE EFFECTS]
-```
-
-### 5. Boss Preparation Subagent
-
-```
-You are a Boss Preparation Subagent for Slay the Spire. Prepare for the upcoming boss fight.
-
-Current situation:
-- Boss: [BOSS_NAME] (Act [ACT_NUMBER])
-- Player: [HP]/[MAX_HP] HP, [GOLD] gold
-- Deck: [FINAL_DECK_STATUS]
-- Relics: [ALL_RELICS]
-
-Tasks:
-1. Analyze boss mechanics and required strategy
-2. Assess deck's readiness for this specific boss
-3. Identify any missing pieces or vulnerabilities
-4. Recommend last-minute preparations
-5. Provide boss-specific strategy
-
-Boss-specific considerations:
-- **Guardian**: High damage, healing, Mode shifts
-- **Hexaghost**: Scaling damage, orb management
-- **Slime Boss**: Split mechanics, AOE needs
-- **Automaton**: Hyper beam, artifact, strength scaling
-
-Return structured summary:
-- **Boss Strategy**: [SPECIFIC APPROACH]
-- **Deck Readiness**: [STRENGTHS/WEAKNESSES]
-- **Key Cards**: [MOST IMPORTANT CARDS]
-- **Timing Strategy**: [WHEN TO SCALE VS DEFEND]
-- **Win Condition**: [HOW TO WIN]
 ```
 
 ## Best Practices
