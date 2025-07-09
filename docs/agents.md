@@ -82,9 +82,12 @@ Tasks:
 1. Read available rewards: python.exe src/sts_tool.py --read-window "Choices"
 2. Analyze each option (gold, potions, cards)
 3. If card option exists, inspect it: python.exe src/sts_tool.py --execute "[card_option_number]"
-4. For each card, analyze: python.exe src/sts_tool.py --execute "c [card_number]" if needed
+4. For each card, analyze: python.exe src/sts_tool.py --execute "c
+   [card_number]" --read-window "Output" if needed
 5. Make strategic decision based on current needs
-6. Execute choice: python.exe src/sts_tool.py --execute "[choice]"
+6. Execute choice: python.exe src/sts_tool.py --execute "[choice]" . Choice can
+   be number or single word e.gg. skip for skipping card rewards.
+8. Remember to always pick the gold and possible relic rewards.
 7. Provide commentary: python.exe src/sts_tool.py --speak "[reasoning]"
 8. Proceed: python.exe src/sts_tool.py --execute "proceed"
 
