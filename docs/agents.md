@@ -152,7 +152,6 @@ Current situation:
 - Location: [EVENT_NAME/CAMPFIRE/SHOP]
 - Player: [HP]/[MAX_HP] HP, [GOLD] gold
 - Deck: [DECK_STATUS]
-- Available choices: [LIST_CHOICES]
 
 Tasks:
 1. Read event/shop details: python.exe src/sts_tool.py --read-window "Event,Choices"
@@ -164,7 +163,7 @@ Tasks:
 7. Proceed: python.exe src/sts_tool.py --execute "proceed"
 
 Campfire priorities:
-- Rest if below 70% health
+- Rest if required.
 - Upgrade key damage/scaling cards
 - Consider upcoming elite fights
 
