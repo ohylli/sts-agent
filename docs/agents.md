@@ -116,25 +116,24 @@ Current situation:
 - Player: [HP]/[MAX_HP] HP, [GOLD] gold
 - Deck: [DECK_STATUS]
 - Relics: [RELEVANT_RELICS]
-
-Available choices:
-[LIST AVAILABLE PATHS]
+- Currently planned route (if any) [planned route]
 
 Tasks:
-1. Use path analysis if helpful: python.exe src/sts_tool.py --execute "path [floor] [x]"
-2. Consider route options for next 3-5 floors
-3. Evaluate room types and their value
-4. Factor in current deck strength vs. needs
-5. Make choice: python.exe src/sts_tool.py --execute "[choice_number]"
-6. Provide commentary: python.exe src/sts_tool.py --speak "[path reasoning]"
+1. Check the current navigation choices and the map python.exe src/sts_tool.py
+   --read-window "Choices,Map"
+2. Use path analysis if helpful: python.exe src/sts_tool.py --execute "path
+   [floor] [x]" --read-window "Output"
+3. Consider route options for next 3-5 floors
+4. Evaluate room types and their value
+5. Factor in current deck strength vs. needs
+6. Make choice: python.exe src/sts_tool.py --execute "[choice_number]"
+7. Provide commentary: python.exe src/sts_tool.py --speak "[path reasoning]"
 
 Key considerations:
 - Elite fights (high risk/reward)
 - Shop access for upgrades/removal
 - Campfire placement for healing/upgrades
-- Treasure rooms for relics
 - Unknown rooms for events
-- Path to key locations (Emerald Key, etc.)
 
 Return structured summary:
 - **Path Chosen**: [SPECIFIC PATH]
