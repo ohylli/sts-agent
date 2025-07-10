@@ -75,27 +75,48 @@ See `docs/cli_tool_api.md` for more details.
 The `prompts/` directory contains example prompts for Claude Code:
 
 - **`play_prompt.md`**: Simple early game combat with commentary
-- **`video_prompt.md`**: YouTube-style demonstration with detailed explanations. Used to make [this video demo](https://www.youtube.com/watch?v=W46J357-c44)
+- **`video_prompt.md`**: YouTube-style demonstration with detailed explanations.
+  Used to make [this video demo](https://www.youtube.com/watch?v=W46J357-c44)
+- **`play_run.md`**: Prompt for playing a run starting from the Neow event
+  utilizing subagents and stopping for occasional user feedback.
 
-These prompts demonstrate how to instruct Claude to play the game effectively.  It is recommended to tell claude code to read them for instructions when in plan mode. Both these assume that game is in the start of early game combat against a single enemy.
+These prompts demonstrate how to instruct Claude to play the game effectively.
+It is recommended to tell claude code to read them for instructions when in plan
+mode. The first two assume that game is in the start of early game combat
+against a single enemy.
 
 ### Gameplay Guide
 
-For a comprehensive guide on how to play Slay the Spire through the CLI tool, see `docs/how_to_play_sts.md`. This guide includes:
+For a comprehensive guide for AI agents on how to play Slay the Spire through
+the CLI tool, see `docs/how_to_play_sts.md`. This guide includes:
 - Essential commands and syntax
 - Game mechanics and objectives
 - Combat system with hand reordering examples
 - Navigation and resource management
 - Audio commentary options
 
+### Subagent guide
+
+For a guide for Claude Code on how to use subagents for a more context efficient
+play see `docs/agents.md`.
+
 ## Current Status and Limitations
 
-This is currently a proof-of-concept. It has been tested only in simple early game combats against a single enemy.
+The subagent based run system (see `prompts/play_run.md`) has so far been used
+in a run where Claude Code got to the act 1 boss with some small hints and notes
+from the human user along the way.
 
 ## TODOs
 
 - Refactor the CLI code removing the stubs module.
-- Give Claude more info about how to play the game. Currently just basic info in the example prompts.
+- Refine the subagent approach:
+  - Combat agent more info about use of potions, energy management and
+    recognizing a gameover.
+  - Reward subagent: Better handling of the choice window and changing choice
+    numbering.
+  - Consider splitting the subagent guide into separate agent specific files
+    which subagents are instructed to read -> less relying on the main agent to
+    instruct the subagents correctly.
 
 ## Technical Details
 

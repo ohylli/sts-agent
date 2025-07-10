@@ -82,6 +82,8 @@ See documentation:
 - `docs/cli_tool_development.md` - CLI tool design and implementation status
 - `docs/cli_tool_api.md` - CLI tool usage and API reference
 - `docs/how_to_play_sts.md` - Comprehensive gameplay guide for AI agents
+- `docs/agents.md` - Guide on using subagents to improve context management in
+  Slay the Spire runs.
 
 ## Directory Structure
 
