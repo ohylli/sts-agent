@@ -16,11 +16,8 @@ python.exe src/sts_tool.py --execute "1,3"  # Play multiple cards
 # End turn
 python.exe src/sts_tool.py --execute "end"
 
-# Make choices
+# Make choices from the Choices window
 python.exe src/sts_tool.py --execute "1"
-
-# Navigation
-python.exe src/sts_tool.py --execute "proceed"
 
 # Combined operations
 python.exe src/sts_tool.py --execute "end" --read-window "Monster"
@@ -31,7 +28,7 @@ python.exe src/sts_tool.py --execute "end" --read-window "Monster"
 - **Hand**: Cards in hand, Potions
 - **Monster**: Enemy info, Intent
 - **Map**: Floor navigation
-- **Choices**: Available actions
+- **Choices**: Available actions in events, on the map and sometimes in combat.
 - **Event**: Event text and outcomes
 - **Deck/Discard**: Card locations
 - **Relic**: Passive items
@@ -80,9 +77,6 @@ python.exe src/sts_tool.py --execute "1"
 
 # Multiple commands (executed in sequence)
 python.exe src/sts_tool.py --execute "1,2,end"
-
-# Skip verification for speed
-python.exe src/sts_tool.py --execute "end" --dont-verify
 ```
 
 ### Efficient Patterns
@@ -90,8 +84,6 @@ python.exe src/sts_tool.py --execute "end" --dont-verify
 # Execute then read
 python.exe src/sts_tool.py --execute "end" --read-window "Monster,Player"
 
-# JSON output for parsing
-python.exe src/sts_tool.py --read-window "Hand" --json
 ```
 
 ## 4. Combat System
@@ -162,10 +154,10 @@ python.exe src/sts_tool.py --execute "pot i 1"
 python.exe src/sts_tool.py --read-window "Map"
 
 # Inspect specific path
-python.exe src/sts_tool.py --execute "map 6 4"  # Check path to floor 6, position 4
+python.exe src/sts_tool.py --execute "map 6 4"  --read-window "Output" # Check path to floor 6, position 4
 
 # Path analysis
-python.exe src/sts_tool.py --execute "path 6 4"  # Analyze all paths to destination
+python.exe src/sts_tool.py --execute "path 6 4" --read-window "Output" # Analyze all paths to destination
 ```
 
 ### Movement
@@ -193,7 +185,7 @@ python.exe src/sts_tool.py --execute "proceed"
 python.exe src/sts_tool.py --read-window "Relic"
 
 # Inspect specific relic
-python.exe src/sts_tool.py --execute "relic 1"
+python.exe src/sts_tool.py --execute "relic 1" --read-window "Output"
 ```
 
 ### Deck Management
@@ -220,8 +212,8 @@ python.exe src/sts_tool.py --read-window "Log"
 ### Choice Inspection
 ```bash
 # Before selecting rewards/events
-python.exe src/sts_tool.py --execute "c 1"  # Inspect choice 1
-python.exe src/sts_tool.py --execute "c 2"  # Inspect choice 2
+python.exe src/sts_tool.py --execute "c 1" --read-window "Output" # Inspect choice 1
+python.exe src/sts_tool.py --execute "c 2" --read-window "Output" # Inspect choice 2
 ```
 
 ### Error Handling
@@ -232,8 +224,7 @@ python.exe src/sts_tool.py --execute "c 2"  # Inspect choice 2
 ### Efficiency Tips
 1. Batch commands when possible: `--execute "1,2,3,end"`
 2. Combine operations: `--execute "end" --read-window "Monster"`
-3. Use `--dont-verify` for non-critical fast actions
-4. Read multiple windows at once for full state
+3. Read multiple windows at once for full state
 
 ## 8. Audio Commentary (Optional)
 
@@ -277,3 +268,5 @@ python.exe src/sts_tool.py --speak "Time to go all-in with attacks" --execute "1
 4. **Energy refreshes** each turn
 5. **Block expires** at turn start
 6. **Choices** can be inspected before selecting
+7. **Feeling stuck outside of combat**: Check choices window and execute numberd
+   choices or one word choices for example proceed.

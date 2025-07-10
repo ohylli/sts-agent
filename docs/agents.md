@@ -47,11 +47,10 @@ To Bash enemy 0, then Strike enemy 1:
 - python.exe src/sts_tool.py --execute "3 1" (Strike shifts from 4→3, targets Jaw Worm)
 
 Using potions:
-```bash
+
 # Use potion
 python.exe src/sts_tool.py --execute "pot u 1"  # Use potion 1
 python.exe src/sts_tool.py --execute "pot u 1 2"  # Use potion 1 on enemy 2
-```
 
 Making card or potion related choices:
 Some cards or potions migth require making a choice. For example silent's
@@ -81,12 +80,12 @@ Current situation:
 Tasks:
 1. Read available rewards: python.exe src/sts_tool.py --read-window "Choices"
 2. Analyze each option (gold, potions, cards)
-3. If card option exists, inspect it: python.exe src/sts_tool.py --execute "[card_option_number]"
+3. If card option exists, inspect it: python.exe src/sts_tool.py --execute "[card_option_number]" --read-window "Choices"
 4. For each card, analyze: python.exe src/sts_tool.py --execute "c
    [card_number]" --read-window "Output" if needed
 5. Make strategic decision based on current needs
 6. Execute choice: python.exe src/sts_tool.py --execute "[choice]" . Choice can
-   be number or single word e.gg. skip for skipping card rewards.
+   be choice number or single word e.gg. skip for skipping card rewards.
 8. Remember to always pick the gold and possible relic rewards.
 7. Provide commentary: python.exe src/sts_tool.py --speak "[reasoning]"
 8. Proceed: python.exe src/sts_tool.py --execute "proceed"
@@ -126,7 +125,7 @@ Tasks:
 3. Consider route options for next 3-5 floors
 4. Evaluate room types and their value
 5. Factor in current deck strength vs. needs
-6. Make choice: python.exe src/sts_tool.py --execute "[choice_number]"
+6. Make choice from Choices window: python.exe src/sts_tool.py --execute "[choice_number]"
 7. Provide commentary: python.exe src/sts_tool.py --speak "[path reasoning]"
 
 Key considerations:
@@ -159,8 +158,11 @@ Tasks:
 3. Consider current deck needs and health
 4. Make decision: python.exe src/sts_tool.py --execute "[choice_number]"
 5. Provide commentary: python.exe src/sts_tool.py --speak "[decision reasoning]"
-6. Handle any follow-up choices
-7. Proceed: python.exe src/sts_tool.py --execute "proceed"
+6. Handle any follow-up choices by rechecking the Event and Choices windows.
+7. You are done when you see Map info in the Choices window that starts like the following.
+
+return
+Floor:0
 
 Campfire priorities:
 - Rest if required.
