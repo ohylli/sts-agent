@@ -122,6 +122,39 @@ def handle_speak(args, speaker):
     return 0 if success else 1
 
 
+def handle_routes(args):
+    """Handle --routes command."""
+    from core.route_evaluator import evaluate_all_routes
+    
+    print(f"\nEvaluating routes to floor 15 rest sites...")
+    print("-" * 60)
+    
+    routes = evaluate_all_routes(top_n=args.routes)
+    
+    # Check for errors
+    if routes and 'error' in routes[0]:
+        print(f"Error: {routes[0]['error']}")
+        return 1
+    
+    if not routes:
+        print("No routes found.")
+        return 1
+    
+    # Display routes
+    print(f"Evaluated {len(routes)} unique routes\n")
+    for i, route in enumerate(routes, 1):
+        print(f"Route {i} (Score: {route['score']}):")
+        counts = route['encounter_counts']
+        print(f"  Emerald {counts['Emerald']}, Elite {counts['Elite']}, Rest {counts['Rest']}, "
+              f"Shop {counts['Shop']}, Unknown {counts['Unknown']}, Monster {counts['Monster']}, "
+              f"Treasure {counts['Treasure']}")
+        print(f"  Path: {route['detail']}")
+        print(f"  Destination: Rest Floor:{route['destination']}")
+        print()
+    
+    return 0
+
+
 def main():
     """Main CLI entry point."""
     parser = argparse.ArgumentParser(
@@ -148,6 +181,8 @@ Examples:
                         help='Read content from one or more windows (comma-separated for multiple)')
     parser.add_argument('--speak', metavar='TEXT',
                         help='Speak the given text using text-to-speech')
+    parser.add_argument('--routes', nargs='?', type=int, const=10, metavar='N',
+                        help='Evaluate routes to floor 15 rest sites (default: top 10)')
     
     # Options
     parser.add_argument('--dont-verify', action='store_true',
@@ -162,7 +197,7 @@ Examples:
     args = parser.parse_args()
     
     # Validate arguments
-    if not any([args.list_windows, args.execute, args.read_window, args.speak]):
+    if not any([args.list_windows, args.execute, args.read_window, args.speak, args.routes]):
         parser.error('No action specified. Use --help for usage information.')
     
     # Initialize speaker if needed
@@ -183,6 +218,8 @@ Examples:
             handle_read_window(args)
         if args.list_windows:
             handle_list_windows(args)
+        if args.routes:
+            handle_routes(args)
             
         # Wait for speech to complete if it was started
         if speaker:
